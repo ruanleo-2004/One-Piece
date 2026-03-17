@@ -52,7 +52,7 @@
             <div class="layui-card-body" style="padding: 25px;">
                 <div class="text-center layui-text">
                     <div class="user-info-head" id="userInfoHead">
-                        <img id="avatar" src="{{ user_info.avatar }}" width="115px" height="115px" alt="">
+                        <img id="avatar" src="{{ user_info.avatar | replace('/_uploads/photos/', '/static/upload/') }}" width="115px" height="115px" alt="">
                     </div>
                     <h2 style="padding-top: 20px;font-size: 20px;">{{ user_info.realname }}</h2>
                     <p style="padding-top: 8px;margin-top: 10px;font-size: 13.5px;">China ， 中国</p>

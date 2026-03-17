@@ -1,33 +1,47 @@
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
+# 虚拟环境
 venv/
 env/
-ENV/
-instance/
+
+# 依赖包
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 数据库文件
 *.db
-*.db-journal
-.DS_Store
+*.sqlite3
+
+# 配置文件
+*.env
+*.local
+
+# 日志文件
 *.log
-*.pid
-*.bak
-*.swp
-*~
-.~n*
-# Flask
-instance/
-.webassets-cache
-# IDE
+logs/
+
+# 测试文件
+pytest_cache/
+.coverage
+
+# 编辑器配置
 .vscode/
 .idea/
-*.sublime-project
-*.sublime-workspace
-# OS
-Thumbs.db
+*.swp
+*.swo
+*~
+
+# 操作系统文件
 .DS_Store
-# Testing
-.pytest_cache/
-.coverage
-htmlcov/
+Thumbs.db
+
+# 临时文件
+tmp/
+temp/
+
+# Flask会话文件
+flask_session/
+
+# 测试脚本
+test_template.py
+check_data.py

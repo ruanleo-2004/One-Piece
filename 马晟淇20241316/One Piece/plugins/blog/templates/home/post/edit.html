@@ -32,7 +32,7 @@
                 <label class="layui-form-label">封面图片</label>
                 <div class="layui-input-block">
                     {% if post.cover %}
-                        <img src="{{ post.cover }}" alt="封面图片"
+                        <img src="{{ post.cover | replace('/_uploads/photos/', '/static/upload/') }}" alt="封面图片"
                              style="max-width: 200px; margin-bottom: 10px;">
                     {% endif %}
                     <input type="file" name="cover" accept="image/png, image/jpeg" class="layui-input">

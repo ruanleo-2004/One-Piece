@@ -136,7 +136,7 @@
             <div class="card bg-white border-light h-100"  data-aos="fade-up" data-aos-duration="{{ 400*loop.index }}">
                 <!-- 图片区域 -->
                 {% if post.cover %}
-                <img src="{{ post.cover }}" alt="{{ post.title }}" class="card-img-top img-fluid" style="object-fit: cover; height: 200px;">
+                <img src="{{ post.cover | replace('/_uploads/photos/', '/static/upload/') }}" alt="{{ post.title }}" class="card-img-top img-fluid" style="object-fit: cover; height: 200px;">
                 {% endif %}
                 <!-- 卡片主体 -->
                 <div class="card-body">

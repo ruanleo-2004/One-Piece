@@ -65,7 +65,7 @@
         <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2 mb-3"  data-aos="fade-up" data-aos-duration="{{ loop.index*300 }}">
             <a href="{{ url_for('blog.news.detail', id=article.id) }}" class="news-card-link">
                 <div class="card h-100">
-                    <img src="{{ article.cover or url_for('static', filename='images/default-news.jpg') }}" class="card-img-top" alt="{{ article.title }}">
+                    <img src="{{ article.cover | replace('/_uploads/photos/', '/static/upload/') if article.cover else url_for('static', filename='images/default-news.jpg') }}" class="card-img-top" alt="{{ article.title }}">
                     <div class="card-body bg-dark-s">
                         <h5 class="card-title">{{ article.title }}</h5>
                         <p class="card-text">{{ article.category_name }}</p>

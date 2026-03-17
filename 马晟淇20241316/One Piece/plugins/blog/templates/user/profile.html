@@ -10,7 +10,7 @@
             <div class="row">
                 <!-- 用户头像 -->
                 <div class="col-md-2 text-center">
-                    <img src="{{ user.avatar }}" alt="{{ user.realname }}" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                    <img src="{{ user.avatar | replace('/_uploads/photos/', '/static/upload/') }}" alt="{{ user.realname }}" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
                 </div>
                 <!-- 用户信息 -->
                 <div class="col-md-10">

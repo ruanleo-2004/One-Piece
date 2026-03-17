@@ -20,7 +20,7 @@
         {% for series in series_list %}
         <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3 mb-4" data-aos="fade-up" data-aos-duration="{{ loop.index*300 }}">
             <div class="r-card card">
-                <img src="{{ series.cover if series.cover.startswith('http') else url_for('static', filename=series.cover) }}" class="card-img-top" alt="{{ series.name }}">
+                <img src="{{ series.cover if series.cover.startswith('http') else (series.cover | replace('/_uploads/photos/', '/static/upload/') if series.cover.startswith('/_uploads/photos/') else url_for('static', filename=series.cover)) }}" class="card-img-top" alt="{{ series.name }}">
                 <div class="card-body bg-dark-s">
                     <h5 class="card-title">{{ series.name }}</h5>
                     <p class="card-text">Year: {{ series.year }}</p>

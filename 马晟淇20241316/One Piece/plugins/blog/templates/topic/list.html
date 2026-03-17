@@ -87,7 +87,7 @@
                         <div class="el-card-block__pic">
                             <div class="el-card-block__pic__inner">
                                 <picture>
-                                    <img src="{{ article.cover or url_for('static', filename='picture/default_topic.png') }}" width="1280" height="854" loading="lazy" alt="{{ article.title }}">
+                                    <img src="{{ article.cover | replace('/_uploads/photos/', '/static/upload/') if article.cover else url_for('static', filename='picture/default_topic.png') }}" width="1280" height="854" loading="lazy" alt="{{ article.title }}">
                                 </picture>
                             </div>
                         </div>

@@ -3,7 +3,7 @@ from flask import render_template
 
 def init_error_views(app):
     @app.errorhandler(403)
-    def page_not_found(e):
+    def forbidden(e):
         return render_template('errors/403.html'), 403
 
     @app.errorhandler(404)

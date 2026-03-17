@@ -112,7 +112,11 @@
                         link.rel = "noopener noreferrer"; // 安全属性
                         
                         imgElement = document.createElement("img");
-                        imgElement.src = image.image_path;
+                        let imageSrc = image.image_path;
+                        if (imageSrc && imageSrc.startsWith('/_uploads/photos/')) {
+                            imageSrc = imageSrc.replace('/_uploads/photos/', '/static/upload/');
+                        }
+                        imgElement.src = imageSrc;
                         imgElement.alt = image.image_name || "海贼王漫画图片";
                         imgElement.classList.add("img-fluid", "rounded");
                         imgElement.title = "点击查看官网"; // 鼠标悬停提示
@@ -122,7 +126,11 @@
                     } else {
                         // 没有URL时，普通图片
                         imgElement = document.createElement("img");
-                        imgElement.src = image.image_path;
+                        let imageSrc = image.image_path;
+                        if (imageSrc && imageSrc.startsWith('/_uploads/photos/')) {
+                            imageSrc = imageSrc.replace('/_uploads/photos/', '/static/upload/');
+                        }
+                        imgElement.src = imageSrc;
                         imgElement.alt = image.image_name || "海贼王漫画图片";
                         imgElement.classList.add("img-fluid", "rounded");
                         imgElement.title = "暂无官网链接";

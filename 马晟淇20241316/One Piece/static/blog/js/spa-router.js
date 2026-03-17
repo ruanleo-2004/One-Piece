@@ -622,7 +622,10 @@ class SPARouter {
     updateNavActiveState(path) {
         this.navLinks.forEach(link => {
             const href = link.getAttribute('href');
-            if (href === path) {
+            // 提取路径部分，忽略查询参数
+            const pathWithoutQuery = path.split('?')[0];
+            const hrefWithoutQuery = href.split('?')[0];
+            if (hrefWithoutQuery === pathWithoutQuery) {
                 link.parentElement.classList.add('active');
             } else {
                 link.parentElement.classList.remove('active');
