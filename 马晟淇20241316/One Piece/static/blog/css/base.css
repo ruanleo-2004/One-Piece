@@ -1,0 +1,655 @@
+/* CSS Document */
+h2 {
+  font-weight: bolder !important;
+}
+
+body {
+  cursor: auto !important;
+}
+/* 全局覆盖Bootstrap的链接悬停颜色 */
+.card-body h5.card-title {
+  color: black !important;
+  text-decoration: none !important;
+  text-decoration-color: black !important;
+}
+.card-body p.card-text {
+  color: black !important;
+  text-decoration: none !important;
+  text-decoration-color: black !important;
+}
+a:hover .card-title {
+  color: black !important;
+  text-decoration: underline !important;
+  text-decoration-color: black !important;
+  text-decoration-line: underline !important;
+}
+a:hover .card-text {
+  color: black !important;
+  text-decoration: underline !important;
+  text-decoration-color: black !important;
+  text-decoration-line: underline !important;
+}
+body {
+  margin: 0 auto;
+/*  overflow: hidden;*/
+}
+
+/* 全局容器样式，确保页面不异常缩小 */
+.container {
+  min-width: 320px !important;
+  width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: 15px !important;
+  padding-right: 15px !important;
+  box-sizing: border-box !important;
+}
+
+/* 修复响应式布局问题 */
+@media (max-width: 575.98px) {
+  .container {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+  
+  /* 调整导航栏样式 */
+  .navbar-brand {
+    margin-left: 10px !important;
+    position: relative !important;
+  }
+  
+  /* 调整容器内边距 */
+  .container.p-5, .container.my-4 {
+    padding: 20px !important;
+    margin-top: 15px !important;
+    margin-bottom: 15px !important;
+  }
+}
+/*.canvaszz {*/
+/*  position: absolute;*/
+/*  background-size: 100%;*/
+/*  !*width: 100%;*!*/
+/*  height: 100%;*/
+/*  object-fit: cover;*/
+/*  object-position: center;*/
+/*  z-index: -1;*/
+/*  filter: alpha(opacity=20);*/
+/*  opacity: 0.4;*/
+/*}*/
+.canvas {
+  position: fixed;
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+    object-fit: cover;
+  object-position: center;
+    top:0;
+
+  vertical-align: baseline;
+  z-index: -2;
+}
+.nav-item a{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  text-wrap: nowrap;
+}
+.navbar {
+  background: linear-gradient(to right, #d53633, #d53633); /* 渐变背景 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 阴影效果 */
+  height: 80px; /* 设置固定高度 */
+}
+
+/* SPA页面切换过渡动画 */
+.container.p-5.pb-0 {
+  transition: all 0.5s ease-in-out;
+  opacity: 1;
+  transform: translateY(0);
+  position: relative;
+  z-index: 1;
+}
+
+/* 页面退出动画 */
+.container.p-5.pb-0.page-exit {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+/* 页面进入动画 */
+.container.p-5.pb-0.page-enter {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.5s ease-in-out forwards;
+}
+
+/* 加载中样式 */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  font-size: 24px;
+  color: #d53633;
+}
+
+/* 错误提示样式 */
+.error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  font-size: 24px;
+  color: #dc3545;
+}
+
+/* 淡入上移动画 */
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 页面内容容器 */
+.container.p-5.pb-0 {
+  background-color: transparent !important;
+  border-radius: 8px;
+  box-shadow: none;
+  min-height: calc(100vh - 200px); /* 确保最小高度，考虑header和footer */
+  width: 100% !important;
+  margin-bottom: 100px !important;
+}
+
+/* 调整logo位置，使其更靠近左侧 */
+.navbar-brand {
+  margin-right: auto !important;
+  margin-left: -100px !important; /* 使用更大的负margin值 */
+  padding-left: 0 !important;
+  position: absolute !important;
+  left: 0 !important;
+  z-index: 1000 !important;
+}
+
+/* 引入奶酪体字体 */
+@font-face {
+  font-family: 'CheeseFont';
+  src: url('https://fonts.gstatic.com/s/kleeone/v21/6xKtdSZaM9iE8KbpRA_LJ3z8mH9BOJvgkP8o58a-wg.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* 确保所有使用CheeseFont的地方都有fallback字体 */
+.nav-link,
+.dropdown-item {
+  font-family: 'CheeseFont', 'Microsoft YaHei', sans-serif !important;
+}
+
+/* 调整导航栏容器的样式 */
+#root {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+body {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+.navbar-brand img {
+  transition: transform 0.3s ease; /* 动态放大缩小效果 */
+  width: 357px !important; /* 调整logo宽度，保持比例 */
+  height: 60px !important; /* 调整logo高度，接近导航栏高度 */
+  object-fit: contain !important; /* 保持图片比例 */
+}
+.navbar-brand img:hover {
+  transform: scale(1.1);
+}
+
+.nav-link {
+  margin: 0 20px;
+  font-size: 18px !important; /* 使用固定像素大小，避免受根字体大小影响 */
+  font-weight: bold;
+  color: #ccc; /* 默认颜色 */
+  transition: all 0.3s ease;
+  display: flex !important;
+  align-items: center !important;
+  flex-direction: row;
+  flex-shrink: 0;
+  font-family: 'CheeseFont', cursive !important;
+}
+
+/* 确保下拉菜单文字大小不受影响 */
+.dropdown-item {
+  font-size: 18px !important;
+  color: #ccc;
+  transition: all 0.3s ease;
+  font-family: 'CheeseFont', cursive !important;
+}
+
+.nav-link img {
+  margin-right: 8px; /* 图标与文字的间距 */
+  width: 35px; /* 设置图标宽度，统一大小 */
+  height: 35px; /* 设置图标高度，统一大小 */
+  object-fit: contain; /* 保持图片比例 */
+  filter: brightness(0) invert(1); /* 将图标变成白色 */
+  opacity: 1 !important; /* 确保完全不透明 */
+  background-color: white; /* 设置白色背景 */
+  border-radius: 8px; /* 四角柔化效果 */
+  padding: 1px; /* 保持适当内边距，同时让图片显示更大 */
+  box-sizing: border-box; /* 确保padding不影响整体大小 */
+  transition: transform 0.3s ease; /* 图标缩放效果 */
+  position: relative;
+  z-index: 1000;
+  flex-shrink: 0; /* 确保图标不被压缩 */
+  display: inline-block; /* 确保正确的盒模型 */
+}
+
+/* 为nav-log.png添加特定样式，确保正确显示 */
+.nav-link img[src*="nav-log.png"] {
+  opacity: 1 !important; /* 确保完全显示颜色 */
+  position: relative;
+  z-index: 1000;
+  display: inline-block;
+  vertical-align: middle;
+  filter: none !important; /* 显示图片原始颜色，覆盖全局过滤规则 */
+}
+
+/* 为nav-product.png添加特定样式，确保正确显示 */
+.nav-link img[src*="nav-product.png"] {
+  opacity: 1 !important; /* 确保完全显示颜色 */
+  position: relative;
+  z-index: 1000;
+  display: inline-block;
+  vertical-align: middle;
+  filter: none !important; /* 显示图片原始颜色，覆盖全局过滤规则 */
+}
+
+/* 为nav-comics.png添加特定样式，确保正确显示 */
+.nav-link img[src*="nav-comics.png"] {
+  opacity: 1 !important; /* 确保完全显示颜色 */
+  position: relative;
+  z-index: 1000;
+  display: inline-block;
+  vertical-align: middle;
+  filter: none !important; /* 显示图片原始颜色，覆盖全局过滤规则 */
+}
+
+/* 为nav-special.png添加特定样式，确保正确显示 */
+.nav-link img[src*="nav-special.png"] {
+  opacity: 1 !important; /* 确保完全显示颜色 */
+  position: relative;
+  z-index: 1000;
+  display: inline-block;
+  vertical-align: middle;
+  filter: none !important; /* 显示图片原始颜色，覆盖全局过滤规则 */
+}
+
+/* 为最新情报导航项的图片板块添加样式 */
+.nav-link img[src*="nav-news.png"] {
+  width: 35px; /* 设置图片板块宽度 */
+  height: 35px; /* 设置图片板块高度 */
+  opacity: 1 !important; /* 确保完全不透明 */
+  background-color: white; /* 设置白色背景 */
+  border-radius: 8px; /* 四角柔化效果 */
+  padding: 1px; /* 保持适当内边距，同时让图片显示更大 */
+  box-sizing: border-box; /* 确保padding不影响整体大小 */
+  object-fit: cover; /* 让图片充满容器，保持比例 */
+  transition: transform 0.3s ease; /* 平滑过渡效果 */
+  flex-shrink: 0; /* 防止图片被压缩 */
+  display: inline-block; /* 确保正确的盒模型 */
+  filter: none !important; /* 显示图片原始颜色，覆盖全局过滤规则 */
+}
+
+/* 为博客导航项的图片板块添加样式 */
+.nav-link img[src*="nav-anime.png"] {
+  opacity: 1 !important; /* 确保完全显示颜色 */
+  position: relative;
+  z-index: 1000;
+  display: inline-block;
+  vertical-align: middle;
+  filter: none !important; /* 显示图片原始颜色，覆盖全局过滤规则 */
+}
+
+/* 为个人中心图标单独设置更大的尺寸 */
+.nav-link img[src*="i-person.svg"] {
+  width: 35px !important; /* 增大个人中心图标宽度 */
+  height: 35px !important; /* 增大个人中心图标高度 */
+  margin-right: 8px !important; /* 调整图标与文字的间距 */
+  flex-shrink: 0 !important; /* 确保图标不被压缩 */
+  align-self: center !important; /* 确保在flex布局中垂直居中 */
+}
+
+/* 为联系我们导航项的图片添加样式 */
+.nav-item:nth-last-child(2) .nav-link img {
+  opacity: 1 !important; /* 确保完全显示颜色 */
+  position: relative;
+  z-index: 1000;
+  display: inline-block;
+  vertical-align: middle;
+  filter: none !important; /* 显示图片原始颜色，覆盖全局过滤规则 */
+  width: 35px; /* 设置图片宽度 */
+  height: 35px; /* 设置图片高度 */
+  object-fit: cover; /* 让图片充满容器，保持比例 */
+  background-color: white; /* 设置白色背景 */
+  border-radius: 8px; /* 四角柔化效果 */
+  padding: 1px; /* 保持适当内边距 */
+  box-sizing: border-box; /* 确保padding不影响整体大小 */
+}
+
+/* 确保primary-color类不会影响图片透明度 */
+.primary-color img {
+  opacity: 1 !important;
+}
+
+.nav-link:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.1); /* 悬停时的背景色 */
+  border-radius: 5px;
+}
+
+.nav-link:hover img {
+  transform: scale(1.2); /* 图标放大效果 */
+}
+
+.nav-item.active .nav-link {
+  color: #fff;
+  border-bottom: 3px solid #fff; /* 当前页面高亮 */
+}
+
+/* 确保只有激活的导航项有下划线 */
+.nav-link {
+  border-bottom: none !important;
+  text-decoration: none !important;
+}
+
+/* 确保激活的导航项的下划线样式正确应用 */
+.nav-item.active .nav-link {
+  border-bottom: 3px solid #fff !important;
+}
+
+.dropdown-menu {
+  background-color: #343a40; /* 下拉菜单背景 */
+  border: none;
+}
+
+.dropdown-item {
+  color: #ccc;
+  transition: all 0.3s ease;
+}
+
+.dropdown-item:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.primary-color {
+  color: #fff !important;
+}
+.bg-dark{
+	background-color:rgba(0,0,0,0.5)!important
+}
+.bg-dark-s{
+	background-color:rgba(0,0,0,0.9)!important
+}
+.bg-light{
+	background-color: rgba(255,255,255,0.4)!important
+}
+.bg-white {
+  background-color: rgba(255, 255, 255, 1) !important;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  color:black;
+}
+
+/* 移除白色覆盖层效果 */
+.bg-white:before {
+  display: none !important;
+  content: none !important;
+}
+
+@keyframes gradientAnimation {
+  0% {
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2));
+  }
+  25% {
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2));
+  }
+  50% {
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2));
+  }
+  75% {
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2));
+  }
+  100% {
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2));
+  }
+}
+
+.bg-white:hover {
+  background-color: rgba(255, 255, 255, 1) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  transform: translateY(-5px);
+}
+
+.bg-white:hover:before {
+  opacity: 0;
+}
+
+.bg-blue{
+	background-color: rgb(167, 78, 220);
+	color:#fff
+}
+
+/* 收藏按钮样式 */
+.favorite-link {
+    background: none;
+    border: none;
+    padding: 0.25rem 0.5rem;  /* 匹配btn-sm的内边距 */
+    font-size: 0.875rem;      /* 匹配btn-sm的字体大小 */
+    line-height: 1.5;
+    cursor: pointer;
+    text-decoration: none !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.favorite-link:hover,
+.favorite-link:active,
+.favorite-link:focus,
+.favorite-link:focus-visible {
+    text-decoration: none !important;
+    opacity: 0.8;
+    transform: scale(1.1); /* 悬浮放大效果 */
+}
+
+.favorite-link i {
+    font-size: 1rem;
+    width: 16px;
+    height: 16px;
+}
+
+/* 点赞按钮图标样式 - 与收藏按钮保持一致 */
+.like-link i {
+    font-size: 1rem;
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+}
+
+/* 点赞数量样式 - 与收藏按钮对齐 */
+.like-link .like-count {
+    font-size: 0.875rem;
+    vertical-align: middle;
+    margin-left: 2px;
+}
+
+/* 增加点赞按钮与"阅读全文"按钮的间距 */
+.like-link {
+    margin-right: 15px !important;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none !important;
+    transition: color 0.15s ease-in-out, transform 0.2s ease-in-out;
+}
+
+/* 确保点赞按钮在所有状态下都没有下划线 */
+.like-link:hover,
+.like-link:active,
+.like-link:focus,
+.like-link:focus-visible {
+    text-decoration: none !important;
+    transform: scale(1.1); /* 悬浮放大效果 */
+}
+
+/* 收藏按钮颜色修改 - 确保所有状态下都保持鲜红色 */
+.favorite-link.text-danger,
+.favorite-link.text-danger:hover,
+.favorite-link.text-danger:active,
+.favorite-link.text-danger:focus,
+.favorite-link.text-danger:focus-visible {
+    color: #dc3545 !important;
+    opacity: 1;
+}
+
+/* 列表页面未收藏链接悬停状态 */
+.favorite-link.text-muted:hover {
+    color: #dc3545 !important;
+}
+
+/* 收藏按钮样式 - 确保焦点状态无阴影 */
+.btn-danger.favorite-btn {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    color: white !important;
+    opacity: 1;
+}
+
+.btn-danger.favorite-btn:hover, 
+.btn-danger.favorite-btn:active {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    color: white !important;
+    opacity: 1;
+    box-shadow: none !important;
+}
+
+/* 移除焦点状态的阴影 */
+.btn-danger.favorite-btn:focus, 
+.btn-danger.favorite-btn:focus-visible {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    color: white !important;
+    opacity: 1;
+    box-shadow: none !important;
+}
+
+/* 确保收藏按钮显示红色 */
+.btn-outline-danger.favorite-btn {
+    color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    background-color: transparent !important;
+}
+
+.btn-outline-danger.favorite-btn:hover, 
+.btn-outline-danger.favorite-btn:active {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    color: white !important;
+    box-shadow: none !important;
+}
+
+/* 移除焦点状态的阴影 */
+.btn-outline-danger.favorite-btn:focus, 
+.btn-outline-danger.favorite-btn:focus-visible {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    color: white !important;
+    box-shadow: none !important;
+}
+
+/* 点赞按钮样式 - 将所有相关蓝色状态改为粉色 #fb7299 */
+
+/* 全局覆盖 - 确保所有text-primary类在点赞上下文中显示粉色 */
+.like-link.text-primary, 
+.like-link.text-primary:hover, 
+.like-link.text-primary:active, 
+.like-link.text-primary:focus, 
+.like-link.text-primary:focus-visible {
+    color: #fb7299 !important;
+    opacity: 1;
+}
+
+/* 列表页面未点赞链接悬停状态 */
+.like-link.text-muted:hover {
+    color: #fb7299 !important;
+    opacity: 0.8;
+}
+
+/* 全局覆盖 - 确保所有btn-primary类在点赞上下文中显示粉色 */
+.btn-primary.like-btn, 
+.btn-primary.like-btn:hover, 
+.btn-primary.like-btn:active {
+    background-color: #fb7299 !important;
+    border-color: #fb7299 !important;
+    color: white !important;
+    opacity: 1;
+    box-shadow: none !important;
+}
+
+/* 移除焦点状态的阴影 */
+.btn-primary.like-btn:focus, 
+.btn-primary.like-btn:focus-visible {
+    background-color: #fb7299 !important;
+    border-color: #fb7299 !important;
+    color: white !important;
+    opacity: 1;
+    box-shadow: none !important;
+}
+
+/* 全局覆盖 - 确保所有btn-outline-primary类在点赞上下文中显示粉色 */
+.btn-outline-primary.like-btn {
+    color: #fb7299 !important;
+    border-color: #fb7299 !important;
+    background-color: transparent !important;
+}
+
+.btn-outline-primary.like-btn:hover, 
+.btn-outline-primary.like-btn:active {
+    background-color: #fb7299 !important;
+    border-color: #fb7299 !important;
+    color: white !important;
+    box-shadow: none !important;
+}
+
+/* 移除焦点状态的阴影 */
+.btn-outline-primary.like-btn:focus, 
+.btn-outline-primary.like-btn:focus-visible {
+    background-color: #fb7299 !important;
+    border-color: #fb7299 !important;
+    color: white !important;
+    box-shadow: none !important;
+}
+
+/* 确保所有点赞相关的text-primary和btn-primary变体都显示粉色 */
+.blog-post-content .text-primary, 
+.blog-post-content .btn-primary, 
+.blog-post-content .btn-outline-primary {
+    color: #fb7299 !important;
+    border-color: #fb7299 !important;
+    background-color: transparent !important;
+}
+
+.blog-post-content .btn-primary {
+    background-color: #fb7299 !important;
+    color: white !important;
+}
+
+/* 覆盖任何可能的浏览器默认样式 */
+*:focus {
+    outline-color: #fb7299 !important;
+}

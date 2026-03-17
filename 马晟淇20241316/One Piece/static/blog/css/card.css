@@ -1,0 +1,35 @@
+.card-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200%;  /* 调整宽度以超出边界 */
+    height: 200%;  /* 调整高度以超出边界 */
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #855a10;
+    font-size: 12rem;
+    font-weight: bold;
+    transform: translate(-50%, -50%) rotate(-15deg); /* 保证文字居中并倾斜 */
+    /*pointer-events: none;*/
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+	z-index: 3
+}
+
+.card:hover .card-overlay {
+    opacity: 1;
+}
+
+.r-card,.card {
+    position: relative;
+    overflow: hidden;  /* 允许子元素溢出 */
+}
+.card-img{
+    object-fit: cover;
+    object-position: center;
+    height: 100%;;
+    width: 100%;
+
+}

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ '编辑系列' if series else '新增系列' }}</title>
+    {% include 'system/common/header.html' %}
+    <script src="{{ url_for('static', filename='node_modules/jquery/dist/jquery.js') }}"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/layer/3.5.1/layer.js"></script>
+</head>
+<body class="pear-container">
+<div class="layui-card">
+    <div class="layui-card-body">
+        <form class="layui-form"
+              action="{{ url_for('system.series.update' if series else 'system.series.add', id=series.id if series else '') }}"
+              method="post" enctype="multipart/form-data">
+            <div class="layui-form-item">
+                <label class="layui-form-label">系列名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="series" required lay-verify="required" placeholder="请输入系列名称"
+                           autocomplete="off" class="layui-input" value="{{ series.series if series else '' }}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">类别</label>
+                <div class="layui-input-block">
+                    <select name="type" required lay-verify="required">
+                        <option value="令和" {% if series and series.type == '令和' %}selected{% endif %}>令和</option>
+                        <option value="昭和" {% if series and series.type == '昭和' %}selected{% endif %}>昭和</option>
+                        <option value="平成" {% if series and series.type == '平成' %}selected{% endif %}>平成</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">作品名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="name" required lay-verify="required" placeholder="请输入作品名称"
+                           autocomplete="off" class="layui-input" value="{{ series.name if series else '' }}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">年份</label>
+                <div class="layui-input-block">
+                    <input type="text" name="year" placeholder="请输入年份" maxlength="4"
+                           autocomplete="off" class="layui-input" value="{{ series.year if series else '' }}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">封面图片</label>
+                <div class="layui-input-block">
+                    {% if series and series.cover %}
+                        <img src="{{ series.cover }}" alt="封面图片" style="max-width: 200px; margin-bottom: 10px;">
+                    {% endif %}
+                    <input type="file" name="cover" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">链接</label>
+                <div class="layui-input-block">
+                    <input type="text" name="link" required lay-verify="required|url" placeholder="请输入链接"
+                           autocomplete="off" class="layui-input" value="{{ series.link if series else '' }}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">是否外部资源</label>
+                <div class="layui-input-block">
+                    <input type="checkbox" name="is_external" lay-skin="switch" lay-text="是|否" value="1"
+                           {% if series and series.is_external %}checked{% endif %}>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">是否开启</label>
+                <div class="layui-input-block">
+                    <input type="checkbox" name="enable" lay-skin="switch" lay-text="开启|关闭" value="1"
+                           {% if not series or series.enable %}checked{% endif %}>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button type="submit" class="pear-btn pear-btn-primary">{{ '保存' if series else '新增' }}</button>
+                    <button type="button" class="pear-btn pear-btn-secondary" onclick="history.back()">取消</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% include 'system/common/footer.html' %}
+<script>
+    layui.use(['form', 'layer'], function () {
+        let form = layui.form;
+        let layer = layui.layer;
+
+        form.on('submit', function (data) {
+            $.ajax({
+                url: "{{ url_for('system.series.update' if series else 'system.series.add', id=series.id if series else '') }}",
+                type: data.form.method,
+                data: new FormData(data.form),
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                    if (res.success) {
+                        layer.msg('操作成功', {icon: 1, time: 1000}, function () {
+                            window.parent.location.reload();
+                        });
+                    } else {
+                        layer.msg('操作失败：' + res.msg, {icon: 2, time: 2000});
+                    }
+                },
+            });
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

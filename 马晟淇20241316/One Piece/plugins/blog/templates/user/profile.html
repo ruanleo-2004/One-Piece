@@ -1,0 +1,108 @@
+{% extends "common/base.html" %}
+
+{% block title %}{{ user.realname }} - 用户个人主页{% endblock %}
+
+{% block main %}
+<div class="container my-4">
+    <!-- 用户信息卡片 -->
+    <div class="card bg-white border-light mb-4">
+        <div class="card-body">
+            <div class="row">
+                <!-- 用户头像 -->
+                <div class="col-md-2 text-center">
+                    <img src="{{ user.avatar }}" alt="{{ user.realname }}" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                </div>
+                <!-- 用户信息 -->
+                <div class="col-md-10">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h2 class="card-title">{{ user.realname }}</h2>
+                            <p class="card-text">用户名: {{ user.username }}</p>
+                            <p class="card-text">注册时间: {{ user.create_at.strftime('%Y-%m-%d') }}</p>
+                            {% if user.remark %}
+                            <p class="card-text">个人简介: {{ user.remark }}</p>
+                            {% else %}
+                            <p class="card-text">该用户还没有个人简介</p>
+                            {% endif %}
+                        </div>
+                        <!-- 关注按钮 -->
+                        {% if current_user.is_authenticated and current_user.id != user.id %}
+                        <div>
+                            {% if current_user.is_following(user) %}
+                            <a href="{{ url_for('blog.user.unfollow', user_id=user.id) }}" class="btn btn-secondary" style="background-color: #6c757d; border-color: #6c757d; color: white;">已关注</a>
+                            {% else %}
+                            <a href="{{ url_for('blog.user.follow', user_id=user.id) }}" class="btn btn-primary" style="background-color: #fb7299; border-color: #fb7299; color: white;">关注</a>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 用户发布的文章 -->
+    <div class="mb-4">
+        <h3>{{ user.realname }} 发布的文章</h3>
+        <div class="row g-4">
+            {% if posts.items %}
+            {% for post in posts.items %}
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card bg-white border-light h-100">
+                    <!-- 文章封面 -->
+                    {% if post.cover %}
+                    <img src="{{ post.cover }}" alt="{{ post.title }}" class="card-img-top img-fluid" style="object-fit: cover; height: 200px;">
+                    {% endif %}
+                    <!-- 文章内容 -->
+                    <div class="card-body">
+                        <h5 class="card-title text-truncate">{{ post.title }}</h5>
+                        <p class="card-text text-truncate">{{ post.content|safe }}</p>
+                    </div>
+                    <!-- 文章底部信息 -->
+                    <div class="card-footer">
+                        <small class="text-muted">
+                            发布时间: {{ post.date_posted.strftime('%Y-%m-%d') }} | 
+                            评论: {{ post.get_comment_count() }} | 
+                            点赞: {{ post.get_like_count() }}
+                        </small>
+                        <div class="float-end">
+                            <a href="{{ url_for('blog.post.detail', post_id=post.id) }}" class="btn btn-sm" style="background-color: #007bff; border-color: #007bff; color: white;" target="_blank">阅读全文</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="col-12">
+                <div class="alert alert-info text-center" role="alert">
+                    该用户还没有发布任何文章
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 分页导航 -->
+    {% if posts.pages > 1 %}
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if posts.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('blog.user.profile', user_id=user.id, page=posts.prev_num) }}">上一页</a>
+            </li>
+            {% endif %}
+            {% for page in posts.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+            <li class="page-item {% if page == posts.page %}active{% endif %}">
+                <a class="page-link" href="{{ url_for('blog.user.profile', user_id=user.id, page=page) }}">{{ page }}</a>
+            </li>
+            {% endfor %}
+            {% if posts.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('blog.user.profile', user_id=user.id, page=posts.next_num) }}">下一页</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

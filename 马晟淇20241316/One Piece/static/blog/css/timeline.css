@@ -1,0 +1,93 @@
+ body {
+            font-family: 'Arial', sans-serif;
+            background-color: #121212; /* 暗色背景 */
+            color: #e0e0e0; /* 白色字体 */
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #4e73df;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 20px;
+            background-color: rgba(29,29,29,0.85); /* 深色背景 */
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .timeline .timeline-item {
+            position: relative;
+            padding: 20px;
+            margin-bottom: 30px;
+            background-color: #333; /* 深色的卡片背景 */
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .timeline .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 20px;
+            height: 12px;
+            width: 12px;
+            background-color: rgba(133,133,133,0.70);
+            border-radius: 50%;
+        }
+
+        .timeline .timeline-item .timeline-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #e0e0e0; /* 白色字体 */
+            margin-bottom: 10px;
+        }
+
+        .timeline .timeline-item .timeline-description {
+            font-size: 1rem;
+            color: #b0b0b0; /* 灰色字体 */
+            line-height: 1.6;
+        }
+
+        .timeline .timeline-item .timeline-image {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            width: 100px;
+            height: 100px;
+            background-color: #444; /* 深灰色背景 */
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* 插图层背景 */
+        .timeline .timeline-item .timeline-image::before {
+            content: '预留插图';
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            background-color: #888; /* 中等灰色背景 */
+            color: white;
+            font-size: 1rem;
+            border-radius: 50%;
+        }
+
+        .timeline .timeline-item .timeline-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }

@@ -1,0 +1,113 @@
+/* 1. 给卡片添加阴影和基础样式 */
+.card {
+    position: relative;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    transition: box-shadow 0.3s ease-in-out; /* 卡片阴影的平滑过渡 */
+    /* 移除固定高度，让卡片根据内容自适应 */
+    /* height: 500px; */
+}
+
+/* 鼠标悬停时卡片效果 */
+.card:hover {
+    box-shadow: none;  /* 移除卡片阴影 */
+}
+
+/* 2. 图片样式 */
+.card img {
+    width: 100%;
+    height: auto;
+    border: none; /* 移除图片边框 */
+    background-color: transparent;  /* 移除图片背景颜色 */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* 图片变换和阴影的平滑过渡 */
+    object-fit: cover;
+    object-position: center;
+}
+
+/* 为列表页面的图片设置高度 */
+.card .card-img-top {
+    height: 200px;
+}
+
+/* 为详情页面的图片设置高度 */
+.container img.img-fluid {
+    height: 300px;
+}
+
+/* 3. 鼠标悬停时图片效果 */
+.card:hover img {
+    transform: scale(1.05); /* 还原图片放大效果 */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);  /* 还原图片阴影 */
+}
+
+/* 为列表页面的card-img-top添加专门的悬停样式 */
+.card:hover .card-img-top {
+    transform: scale(1.05); /* 列表页面图片放大效果 */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);  /* 列表页面图片阴影 */
+}
+
+/* 4. 美化卡片的内容区域 */
+.card-body {
+    position: relative;
+    padding: 1.5rem;
+    background-color: #fff;
+    z-index: 2;
+}
+
+/* 5. 将bg-dark-s类改为完全透明并移除阴影 */
+.bg-dark-s {
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
+/* 6. 确保card-body.bg-dark-s也应用相同样式 */
+.card-body.bg-dark-s {
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
+/* 7. 将深色卡片背景改为白色 */
+.card.bg-dark {
+    background-color: white !important;
+    color: black !important;
+}
+
+/* 8. 确保深色卡片的页脚也是白色背景 */
+.card.bg-dark .card-footer {
+    background-color: white !important;
+    border-color: #dee2e6 !important;
+}
+
+/* 统一设置评论区所有卡片的背景色为#F9F7F4 */
+.comments .card, .comments .card .card-body, .comment-body {
+    background-color: #F9F7F4 !important;
+}
+
+/* 评论区卡片专门的悬浮样式，移除所有悬浮效果 */
+.comments .card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important; /* 保持默认阴影 */
+    transform: none !important; /* 防止卡片放大 */
+}
+
+/* 评论区图片专门的样式，移除悬浮时的放大效果 */
+.comments .card:hover img {
+    transform: none !important; /* 防止图片放大 */
+    box-shadow: none !important; /* 防止图片添加阴影 */
+}
+
+/* 评论区列表图片专门的样式，移除悬浮时的放大效果 */
+.comments .card:hover .card-img-top {
+    transform: none !important; /* 防止列表图片放大 */
+    box-shadow: none !important; /* 防止列表图片添加阴影 */
+}
+
+/* 14. 移除博客卡片的白色覆盖层效果 */
+.card.bg-white:before {
+    display: none !important;
+}
+
+/* 确保博客卡片在非悬停状态下也完全不透明 */
+.card.bg-white {
+    background-color: rgba(255, 255, 255, 1) !important;
+}

@@ -1,0 +1,80 @@
+<div class="card mb-3" style="background-color: #F9F7F4; opacity: 0; transform: translateY(20px); transition: opacity 0.3s ease, transform 0.3s ease;">
+    <div class="card-body d-flex comment-body" style="background-color: #F9F7F4;">
+        <!-- 用户头像 -->
+        <a href="{{ url_for('blog.user.profile', user_id=comment.user.id) }}">
+            <img src="{{ comment.user.avatar }}" alt="{{ comment.user.realname }}" class="rounded-circle me-3 mr-3" style="width: 50px; height: 50px; cursor: pointer;">
+        </a>
+        <!-- 评论内容 -->
+        <div style="flex: 1;">
+            <div class="d-flex justify-content-between align-items-start">
+                <p class="card-text">{{ comment.content }}</p>
+                <!-- 评论操作按钮 -->
+                <div class="d-flex gap-3">
+                    <!-- 删除按钮 -->
+                    {% if current_user.is_authenticated and current_user.id == comment.user.id %}
+                    <form action="{{ url_for('blog.post.delete_comment', comment_id=comment.id) }}" method="POST" style="display: inline; margin-right: 10px;">
+                        <button type="submit" class="btn btn-sm btn-danger btn-action">
+                            删除
+                        </button>
+                    </form>
+                    {% endif %}
+                    <!-- 回复按钮 -->
+                    <button type="button" class="btn btn-sm btn-primary btn-action" onclick="toggleReplyForm('{{ comment.id }}')" style="background-color: #00abe8; border-color: #00abe8;">
+                        回复
+                    </button>
+                </div>
+            </div>
+            <p class="text-muted">
+                评论者: <a href="{{ url_for('blog.user.profile', user_id=comment.user.id) }}" class="text-muted">{{ comment.user.realname }}</a> | 评论时间: {{ comment.date_posted.strftime('%Y-%m-%d') }}
+            </p>
+            
+            <!-- 回复表单 -->
+            <div id="reply-form-{{ comment.id }}" style="display: none; margin-top: 1rem;">
+                <form method="POST" action="{{ url_for('blog.post.reply_comment', post_id=comment.post_id, comment_id=comment.id) }}">
+                    <div class="form-group">
+                        <textarea name="content" class="form-control" rows="2" placeholder="写下您的回复" required></textarea>
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-sm btn-outline-primary emoji-btn" onclick="toggleEmojiPicker('reply-{{ comment.id }}')">
+                            <i class="far fa-smile"></i> 表情
+                        </button>
+                            <div id="emoji-picker-reply-{{ comment.id }}" class="emoji-picker" style="display: none; position: absolute; background: white; border: 1px solid #ddd; padding: 10px; border-radius: 4px; z-index: 1000; max-height: 200px; overflow-y: auto;"></div>
+                        </div>
+                    </div>
+                    <div class="text-right mt-2">
+                        <button type="button" class="btn btn-sm btn-secondary me-2" onclick="toggleReplyForm('{{ comment.id }}')">取消</button>
+                        <button type="submit" class="btn btn-sm btn-primary" style="background-color: #00abe8; border-color: #00abe8;">提交回复</button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- 显示回复 -->
+            {% for reply in comment.replies %}
+            <div class="card mt-3 ml-5" style="background-color: #F5F5F5; opacity: 0; transform: translateY(10px); transition: opacity 0.3s ease, transform 0.3s ease;">
+                <div class="card-body d-flex comment-body" style="background-color: #F5F5F5;">
+                    <!-- 回复者头像 -->
+                    <a href="{{ url_for('blog.user.profile', user_id=reply.user.id) }}">
+                        <img src="{{ reply.user.avatar }}" alt="{{ reply.user.realname }}" class="rounded-circle me-3 mr-3" style="width: 40px; height: 40px; cursor: pointer;">
+                    </a>
+                    <!-- 回复内容 -->
+                    <div style="flex: 1;">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <p class="card-text"><strong>回复 @{{ reply.parent.user.realname }}:</strong> {{ reply.content }}</p>
+                            <!-- 回复删除按钮 -->
+                            {% if current_user.is_authenticated and current_user.id == reply.user.id %}
+                            <form action="{{ url_for('blog.post.delete_comment', comment_id=reply.id) }}" method="POST" style="display: inline; margin-right: 10px;">
+                                <button type="submit" class="btn btn-sm btn-danger btn-action">
+                                    删除
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                        <p class="text-muted small">
+                            回复者: <a href="{{ url_for('blog.user.profile', user_id=reply.user.id) }}" class="text-muted">{{ reply.user.realname }}</a> | 回复时间: {{ reply.date_posted.strftime('%Y-%m-%d') }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>

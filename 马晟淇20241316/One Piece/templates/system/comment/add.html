@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增评论</title>
+
+    <script src="{{ url_for('static', filename='node_modules/jquery/dist/jquery.js') }}"></script>
+{#    <script src="https://cdn.bootcdn.net/ajax/libs/layer/3.5.1/layer.js"></script>#}
+    {% include 'system/common/header.html' %}
+</head>
+<body class="pear-container">
+<div class="layui-card">
+    <div class="layui-card-header">
+        <h3>新增评论</h3>
+    </div>
+    <div class="layui-card-body">
+        <form class="layui-form" action="{{ url_for('system.comment.save') }}" method="post">
+            <div class="layui-form-item">
+                <label class="layui-form-label">评论内容</label>
+                <div class="layui-input-block">
+                    <textarea name="content" required placeholder="请输入评论内容" class="layui-textarea"></textarea>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">选择用户</label>
+                <div class="layui-input-block">
+                    <select name="userId" lay-verify="required">
+                        <option value="">请选择用户</option>
+                        {% for user in users %}
+                            <option value="{{ user.id }}">{{ user.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">选择文章</label>
+                <div class="layui-input-block">
+                    <select name="postId" lay-verify="required">
+                        <option value="">请选择文章</option>
+                        {% for post in posts %}
+                            <option value="{{ post.id }}">{{ post.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn layui-btn-normal" lay-submit lay-filter="save">保存</button>
+                    <a class="layui-btn layui-btn-primary" href="{{ url_for('system.comment.main') }}">取消</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% include 'system/common/footer.html' %}
+<script>
+    layui.use(['form', 'layer'], function () {
+        var form = layui.form,
+            layer = layui.layer;
+
+        form.on('submit(save)', function (data) {
+            $.ajax({
+                url: '{{ url_for("system.comment.save") }}',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data.field),
+                success: function (response) {
+                    // 处理成功响应
+                    if (response.success) {
+                        layer.msg(response.msg, {icon: 1}); // 显示成功提示
+                        setTimeout(function () {
+                            location.reload()
+                        }, 2000);
+                    } else {
+                        layer.msg(response.msg, {icon: 2}); // 显示错误提示
+                    }
+                },
+                {#success: function(response) {#}
+                {#    if (response.success) {#}
+                {#        layer.msg(response.msg, {icon: 1}, function() {#}
+                {#            window.location.href = "{{ url_for('system.comment.main') }}";#}
+                {#        });#}
+                {#    } else {#}
+                {#        layer.msg(response.msg, {icon: 2});#}
+                {#    }#}
+                {#\}#}
+            });
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

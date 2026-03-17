@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>篇章故事管理</title>
+    {% include 'system/common/header.html' %}
+</head>
+<body class="pear-container">
+<div class="layui-card">
+    <div class="layui-card-body">
+        <form class="layui-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label">篇章故事标题</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="title" placeholder="输入篇章故事标题" class="layui-input">
+                </div>
+                <button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="topic-query">
+                    <i class="layui-icon layui-icon-search"></i> 查询
+                </button>
+                <button type="reset" class="pear-btn pear-btn-md">
+                    <i class="layui-icon layui-icon-refresh"></i> 重置
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="layui-card">
+    <div class="layui-card-body">
+        <table id="topic-table" lay-filter="topic-table"></table>
+    </div>
+</div>
+
+<script type="text/html" id="topic-toolbar">
+    <button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add">
+        <i class="layui-icon layui-icon-add-1"></i> 新增篇章故事
+    </button>
+</script>
+
+<script type="text/html" id="topic-bar">
+    <button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="edit"><i class="layui-icon layui-icon-edit"></i> 编辑
+    </button>
+    <button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove"><i class="layui-icon layui-icon-delete"></i>
+        删除
+    </button>
+</script>
+
+{% include 'system/common/footer.html' %}
+{{ ckeditor.config(name='content', versionCheck=false) }}
+<script>
+    layui.use(['table', 'form', 'jquery', 'layer'], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let $ = layui.jquery;
+
+        let MODULE_PATH = '/system/topic/';
+
+        table.render({
+            elem: '#topic-table',
+            url: MODULE_PATH + 'data',
+            page: true,
+            cols: [
+                [
+                    {title: 'ID', field: 'id', align: 'center', width: 80},
+                    {title: '标题', field: 'title', align: 'center', width: 200},
+                    {title: '链接', field: 'link', align: 'center', width: 200},
+                    {title: '原作', field: 'original_work', align: 'center', width: 150},
+                    {title: '动画', field: 'anime', align: 'center', width: 150},
+                    {title: '是否开启', field: 'enable', align: 'center', templet: '#enableTpl', width: 120},
+                    {title: '创建时间', field: 'create_time', align: 'center', width: 180},
+                    {title: '操作', toolbar: '#topic-bar', align: 'center', width: 300}
+                ]
+            ],
+            toolbar: '#topic-toolbar',
+            defaultToolbar: ['filter', 'print', 'exports']
+        });
+
+        form.on('submit(topic-query)', function (data) {
+            let title = data.field.title; // 获取输入框的值
+            table.reload('topic-table', { // 重载表格
+                where: {title}, // 将参数传递给后端
+                page: {curr: 1} // 重置到第一页
+            });
+            return false; // 阻止默认表单提交行为
+        });
+
+        table.on('toolbar(topic-table)', function (obj) {
+            if (obj.event === 'add') {
+                window.add();
+            }
+        });
+
+        table.on('tool(topic-table)', function (obj) {
+            if (obj.event === 'edit') {
+                window.edit(obj);
+            } else if (obj.event === 'remove') {
+                window.remove(obj);
+            }
+        });
+
+        window.add = function () {
+            layer.open({
+                type: 2,
+                title: '新增篇章故事',
+                area: ['800px', '600px'],
+                content: MODULE_PATH + 'add'
+            });
+        };
+
+        window.edit = function (obj) {
+            layer.open({
+                type: 2,
+                title: '编辑篇章故事',
+                area: ['800px', '600px'],
+                content: MODULE_PATH + 'edit/' + obj.data.id
+            });
+        };
+
+        window.remove = function (obj) {
+            layer.confirm('确实要删除这个篇章故事吗？', {icon: 3, title: '提示'}, function (index) {
+                $.ajax({
+                    url: MODULE_PATH + 'remove/' + obj.data.id,
+                    type: 'delete',
+                    success: function (res) {
+                        if (res.success) {
+                            layer.msg('删除成功', {icon: 1});
+                            obj.del();
+                        } else {
+                            layer.msg('删除失败', {icon: 2});
+                        }
+                    }
+                });
+                layer.close(index);
+            });
+        };
+    });
+</script>
+</body>
+</html>

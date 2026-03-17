@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>{% if url_from == "home" %}用户登录{% else %}管理员登录{% endif %}</title>
+    {% include 'system/common/header.html' %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='system/admin/css/other/login.css') }}"/>
+    <link href="{{ url_for('static', filename='blog/css/bootstrap-4.4.1.css') }}" rel="stylesheet"/>
+    {#<link href="{{ url_for('static', filename='blog/css/main.css') }}" rel="stylesheet" />#}
+    {#<link href="{{ url_for('static', filename='blog/css/nav-style.css') }}" rel="stylesheet" />#}
+    <link href="{{ url_for('static', filename='blog/css/base.css') }}" rel="stylesheet"/>
+</head>
+
+<body class="login-body">
+
+
+<form class="layui-form p-5 bg-dark {% if url_from == 'home' %}user-login-form{% endif %}" action="javascript:void(0);">
+    <div class="layui-form-item text-center">
+        <img class="logo" src="{{ url_for('static', filename='picture/logo.png') }}"/>
+
+        <div class="desc">
+            海贼王网站 {% if url_from == "home" %}用户登录{% else %}管理员登录{% endif %}
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <input name="username" type="text" placeholder="用户名：" value="" hover class="layui-input"/>
+    </div>
+    <div class="layui-form-item">
+        <input name="password" type="password" placeholder="密码：" value="" hover class="layui-input"/>
+    </div>
+    <div class="layui-form-item">
+        <input placeholder="验证码 : " name="captcha" hover class="code layui-input layui-input-inline"/>
+        <img src="{{ url_for('system.passport.get_captcha') }}" class="codeImage" id="captchaImage"/>
+    </div>
+    <div class="layui-form-item">
+        <input type="checkbox" name="remember-me" title="记住密码" lay-skin="primary">
+    </div>
+    {#注册#}
+    {% if url_from == "home" %}
+        <div class="layui-form-item">
+            <a href="{{ url_for('system.passport.register') }}" class="layui-btn layui-btn-primary">
+                注 册
+            </a>
+        </div>{% endif %}
+
+    <div class="layui-form-item">
+        <button class="pear-btn pear-btn-success login" lay-submit lay-filter="login">
+            登 入
+        </button>
+    </div>
+</form>
+
+{% include 'system/common/footer.html' %}
+<script>
+    layui.use(['form', 'jquery', 'layer', 'button', 'popup'], function () {
+        let form = layui.form;
+        let $ = layui.jquery;
+        let layer = layui.layer;
+        let button = layui.button;
+        let popup = layui.popup;
+        let captchaPath = "{{ url_for('system.passport.get_captcha') }}";
+
+        /**
+         * 刷新验证码函数
+         */
+        const refreshCaptchaImage = (function () {
+            let captchaImage = document.getElementById("captchaImage")
+            return function () {
+                captchaImage.src = captchaPath + "?" + Math.random()
+            }
+        })()
+
+        /**
+         * 立即刷新验证码并且每隔 30秒 刷新
+         */
+        const initCaptchaImageTimer = (function () {
+            let captchaImageTimer = null
+            return function () {
+                clearInterval(captchaImageTimer)
+                captchaImageTimer = setInterval(function () {
+                    refreshCaptchaImage()
+                }, 30 * 1000);
+                refreshCaptchaImage()
+            }
+        })()
+        initCaptchaImageTimer()
+
+        form.on('submit(login)', function (data) {
+            let loader = layer.load();
+            let btn = button.load({elem: '.login'});
+            $.ajax({
+                data: data.field,
+                type: "post",
+                dataType: 'json',
+                success: function (result) {
+                    layer.close(loader);
+                    btn.stop(function () {
+                        if (result.success) {
+                            popup.success(result.msg, function () {
+                                location.href = "{{ url_for('index.home') if url_from=='home' else url_for('index.admin') }}";
+                            })
+                        } else {
+                            popup.failure(result.msg, function () {
+                                initCaptchaImageTimer()
+                            });
+                        }
+                    })
+                }
+            });
+            return false;
+        });
+        $("#captchaImage").click(function () {
+            initCaptchaImageTimer()
+        });
+    })
+</script>
+<script>
+    if (window !== top) {
+        top.location.href = location.href;
+    }
+</script>
+<script src="{{ url_for('static', filename='blog/js/click-effect.js') }}"></script>
+<script src="{{ url_for('static', filename='blog/js/jquery-3.4.1.min.js') }}"></script>
+<script src="{{ url_for('static', filename='blog/js/popper.min.js') }}"></script>
+<script src="{{ url_for('static', filename='blog/js/bootstrap-4.4.1.js') }}"></script>
+
+<script src="{{ url_for('static', filename='blog/js/drag-nav.js') }}"></script>
+</body>
+</html>

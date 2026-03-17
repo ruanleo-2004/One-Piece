@@ -1,0 +1,49 @@
+/* CSS Document */
+
+header h1 {
+  font-size: 2.5rem;
+}
+
+#gallery img {
+  border-radius: 10px;
+  object-fit: contain;
+  width: 100%;
+  height: auto;
+	margin: 10px 0px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#gallery img:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* 分页控件样式，仅活跃页为红色背景白色文字 */
+.pagination {
+  margin-top: 30px;
+}
+
+.pagination .page-link {
+  color: #333 !important; /* 默认为深灰色 */
+  border-color: #ddd !important;
+  background-color: #fff !important; /* 默认白色背景 */
+}
+
+.pagination .page-link:hover {
+  color: #333 !important;
+  background-color: #f8f9fa !important; /* 悬停时浅灰色背景 */
+  border-color: #ddd !important;
+}
+
+.pagination .page-item.active .page-link {
+  color: white !important; /* 活跃页字体为白色 */
+  background-color: #dc3545 !important; /* 活跃页红色背景 */
+  border-color: #dc3545 !important;
+}
+
+.pagination .page-item.disabled .page-link {
+  color: #6c757d !important;
+  background-color: #fff !important;
+  border-color: #dee2e6 !important;
+}

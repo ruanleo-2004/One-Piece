@@ -1,0 +1,64 @@
+{% extends "common/base.html" %}
+
+{% block title %}{{ article.title }} - 篇章故事{% endblock %}
+
+{% block main %}
+    <!DOCTYPE html>
+    <html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ article.title }} - 篇章故事</title>
+{#        <link href="{{ url_for('static', filename='blog/css/news-item.css') }}" rel="stylesheet">#}
+         <link href="{{ url_for('static', filename='blog/css/topic-item.css') }}" rel="stylesheet">
+    </head>
+    <body>
+    <div class="container p-5 bg-white">
+        <!-- 篇章故事标题 -->
+        <h1 class="news-title text-center">{{ article.title }}</h1>
+
+        <!-- 篇章故事发布时间 -->
+        <div class="news-meta">
+            <!-- 格式化篇章故事创建时间 -->
+            <span class="news-date">{{ article.create_time.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+        </div>
+        
+        <!-- 原作和动画信息 -->
+        {% if article.original_work or article.anime %}
+        <div class="news-info">
+            {% if article.original_work %}
+            <p><strong>原作：</strong>{{ article.original_work }}</p>
+            {% endif %}
+            {% if article.anime %}
+            <p><strong>动画：</strong>{{ article.anime }}</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- 篇章故事封面图 -->
+{#        {% if article.cover %}#}
+{#            <div class="news-cover">#}
+{#                {% if article.cover.startswith('http') %}#}
+{#                    <img src="{{ article.cover }}" alt="Cover image" class="img-fluid">#}
+{#                {% else %}#}
+{#                    <img src="{{ url_for('static', filename='images/' + article.cover) }}" alt="Cover image" class="img-fluid">#}
+{#                {% endif %}#}
+{#            </div>#}
+{#        {% endif %}#}
+
+        <!-- 篇章故事内容 -->
+        <div class="news-content">
+            {{ article.content | safe }}
+        </div>
+
+        <!-- 篇章故事链接 -->
+        {% if article.link %}
+            <div class="news-link">
+                <a href="{{ article.link }}" target="_blank">阅读原文</a>
+            </div>
+        {% endif %}
+    </div>
+
+    </body>
+    </html>
+{% endblock %}

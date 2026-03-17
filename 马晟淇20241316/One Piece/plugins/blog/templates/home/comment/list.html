@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理您的评论</title>
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/layui-src/dist/css/layui.css"  />
+</head>
+<body>
+
+<div class="layui-container layui-margin-top">
+    <h1>管理您的评论</h1>
+
+    <!-- 评论筛选 -->
+    <form class="layui-form layui-form-inline mb-4" action="{{ url_for('blog.home_comment.manage_comments') }}" method="GET">
+        <div class="layui-form-item">
+            <label class="layui-form-label">博客标题</label>
+            <div class="layui-input-inline">
+                <input type="text" name="filter_title" class="layui-input" value="{{ filter_title }}" placeholder="输入标题筛选">
+            </div>
+            <button type="submit" class="layui-btn layui-btn-primary">筛选</button>
+        </div>
+    </form>
+
+    <!-- 评论列表 -->
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <ul class="layui-timeline">
+                {% for comment in comments.items %}
+                <li class="layui-timeline-item">
+                    <i class="layui-icon layui-timeline-axis">&#xe63f;</i>
+                    <div class="layui-timeline-content layui-text">
+                        <h3><strong>{{ comment.post.title }}</strong></h3>
+                        <p class="layui-text-muted">评论时间: {{ comment.date_posted.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                        <p>{{ comment.content[:100] }}...</p>
+                        <div class="layui-btn-group">
+                            <a href="{{ url_for('blog.post.detail', post_id=comment.post.id) }}" class="layui-btn layui-btn-sm layui-btn-normal" target="_blank">查看博客</a>
+                            <form action="{{ url_for('blog.home_comment.delete_comment', comment_id=comment.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="layui-btn layui-btn-sm layui-btn-danger">删除</button>
+                            </form>
+                        </div>
+                    </div>
+                </li>
+                {% else %}
+                <p>您没有评论。</p>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- 分页 -->
+    <div class="layui-row layui-col-space15 layui-margin-top">
+        <div class="layui-col-md12">
+            <div class="layui-btn-group layui-btn-group-justified">
+                {% if comments.has_prev %}
+                <a class="layui-btn layui-btn-primary" href="{{ url_for('blog.home_comment.manage_comments', page=comments.prev_num, filter_title=filter_title) }}">上一页</a>
+                {% endif %}
+                <span class="layui-btn layui-btn-disabled">{{ comments.page }} / {{ comments.pages }}</span>
+                {% if comments.has_next %}
+                <a class="layui-btn layui-btn-primary" href="{{ url_for('blog.home_comment.manage_comments', page=comments.next_num, filter_title=filter_title) }}">下一页</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- 引入layui脚本 -->
+<script src="https://cdn.jsdelivr.net/npm/layui-src/dist/js/layui.all.js"></script>
+<script>
+    layui.use(['form', 'laypage'], function () {
+        var form = layui.form;
+        var laypage = layui.laypage;
+    });
+</script>
+</body>
+</html>

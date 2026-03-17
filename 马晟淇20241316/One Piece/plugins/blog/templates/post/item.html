@@ -1,0 +1,815 @@
+{% extends "common/base.html" %}
+
+{% block title %}{{ post.title }} - 海贼王博客详情{% endblock %}
+
+{% block main %}
+<div class="container bg-white my-4 text-center text-dark border-light p-5">
+    <h1>{{ post.title }}</h1>
+    <p class="text-muted">作者: {{ post.get_author().realname }} | 发布日期: {{ post.date_posted.strftime('%Y-%m-%d') }}</p>
+    <div class="my-3 d-flex gap-2" style="justify-content: center; align-items: center;">
+        {% if current_user.is_authenticated %}
+            {% if current_user.is_favoriting(post) %}
+                <a href="{{ url_for('blog.post.unfavorite', post_id=post.id) }}" class="btn btn-danger btn-sm favorite-btn" data-action="unfavorite" data-post-id="{{ post.id }}" data-url="{{ url_for('blog.post.unfavorite', post_id=post.id) }}">
+                    <i class="fas fa-heart"></i> 已收藏
+                </a>
+            {% else %}
+                <a href="{{ url_for('blog.post.favorite', post_id=post.id) }}" class="btn btn-outline-danger btn-sm favorite-btn" data-action="favorite" data-post-id="{{ post.id }}" data-url="{{ url_for('blog.post.favorite', post_id=post.id) }}">
+                    <i class="far fa-heart"></i> 收藏
+                </a>
+            {% endif %}
+            {% if current_user.is_liking(post) %}
+                <a href="{{ url_for('blog.post.unlike', post_id=post.id) }}" class="btn btn-primary btn-sm like-btn" data-action="unlike" data-post-id="{{ post.id }}" data-url="{{ url_for('blog.post.unlike', post_id=post.id) }}">
+                    <i class="fas fa-thumbs-up"></i> 已点赞 <span class="like-count">{{ post.get_like_count() }}</span>
+                </a>
+            {% else %}
+                <a href="{{ url_for('blog.post.like', post_id=post.id) }}" class="btn btn-outline-primary btn-sm like-btn" data-action="like" data-post-id="{{ post.id }}" data-url="{{ url_for('blog.post.like', post_id=post.id) }}">
+                    <i class="far fa-thumbs-up"></i> 点赞 <span class="like-count">{{ post.get_like_count() }}</span>
+                </a>
+            {% endif %}
+        {% else %}
+            <a href="#" class="btn btn-outline-danger btn-sm favorite-btn" data-action="favorite" data-post-id="{{ post.id }}">
+                <i class="far fa-heart"></i> 收藏
+            </a>
+            <a href="#" class="btn btn-outline-primary btn-sm like-btn" data-action="like" data-post-id="{{ post.id }}">
+                <i class="far fa-thumbs-up"></i> 点赞 <span class="like-count">{{ post.get_like_count() }}</span>
+            </a>
+        {% endif %}
+    </div>
+    <img src="{{ post.cover }}" class="img-fluid mb-4" alt="{{ post.title }}">
+    <div class="content text-left">
+        {{ post.content|safe }}
+    </div>
+    <hr>
+    <div class="comments my-4 text-left">
+        <h3>评论区</h3>
+        {% for comment in post.comments %}
+        {% if not comment.parent_id %} <!-- 只显示顶级评论 -->
+        <div class="card mb-3" style="background-color: #F9F7F4;">
+            <div class="card-body d-flex comment-body" style="background-color: #F9F7F4;">
+                <!-- 用户头像 -->
+                <a href="{{ url_for('blog.user.profile', user_id=comment.user.id) }}">
+                    <img src="{{ comment.user.avatar }}" alt="{{ comment.user.realname }}" class="rounded-circle me-3 mr-3" style="width: 50px; height: 50px; cursor: pointer;">
+                </a>
+                <!-- 评论内容 -->
+                <div style="flex: 1;">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <p class="card-text">{{ comment.content }}</p>
+                        <!-- 评论操作按钮 -->
+                        <div class="d-flex gap-3">
+                            <!-- 删除按钮 -->
+                            {% if current_user.is_authenticated and current_user.id == comment.user.id %}
+                            <form action="{{ url_for('blog.post.delete_comment', comment_id=comment.id) }}" method="POST" style="display: inline; margin-right: 10px;">
+                                <button type="submit" class="btn btn-sm btn-danger btn-action">
+                                    删除
+                                </button>
+                            </form>
+                            {% endif %}
+                            <!-- 回复按钮 -->
+                            <button type="button" class="btn btn-sm btn-primary btn-action" onclick="toggleReplyForm('{{ comment.id }}')" style="background-color: #00abe8; border-color: #00abe8;">
+                                回复
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-muted">
+                        评论者: <a href="{{ url_for('blog.user.profile', user_id=comment.user.id) }}" class="text-muted">{{ comment.user.realname }}</a> | 评论时间: {{ comment.date_posted.strftime('%Y-%m-%d') }}
+                    </p>
+                    
+                    <!-- 回复表单 -->
+                    <div id="reply-form-{{ comment.id }}" style="display: none; margin-top: 1rem;">
+                        <form method="POST" action="{{ url_for('blog.post.reply_comment', post_id=post.id, comment_id=comment.id) }}">
+                            <div class="form-group">
+                                <textarea name="content" class="form-control" rows="2" placeholder="写下您的回复" required></textarea>
+                                <div class="mt-2">
+                                    <button type="button" class="btn btn-sm btn-outline-primary emoji-btn" onclick="toggleEmojiPicker('reply-{{ comment.id }}')">
+                                    <i class="far fa-smile"></i> 表情
+                                </button>
+                                    <div id="emoji-picker-reply-{{ comment.id }}" class="emoji-picker" style="display: none; position: absolute; background: white; border: 1px solid #ddd; padding: 10px; border-radius: 4px; z-index: 1000; max-height: 200px; overflow-y: auto;"></div>
+                                </div>
+                            </div>
+                            <div class="text-right mt-2">
+                                <button type="button" class="btn btn-sm btn-secondary me-2" onclick="toggleReplyForm('{{ comment.id }}')">取消</button>
+                                <button type="submit" class="btn btn-sm btn-primary" style="background-color: #00abe8; border-color: #00abe8;">提交回复</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- 显示回复 -->
+                    {% for reply in comment.replies %}
+                    <div class="card mt-3 ml-5" style="background-color: #F5F5F5;">
+                        <div class="card-body d-flex comment-body" style="background-color: #F5F5F5;">
+                            <!-- 回复者头像 -->
+                            <a href="{{ url_for('blog.user.profile', user_id=reply.user.id) }}">
+                                <img src="{{ reply.user.avatar }}" alt="{{ reply.user.realname }}" class="rounded-circle me-3 mr-3" style="width: 40px; height: 40px; cursor: pointer;">
+                            </a>
+                            <!-- 回复内容 -->
+                            <div style="flex: 1;">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <p class="card-text"><strong>回复 @{{ reply.parent.user.realname }}:</strong> {{ reply.content }}</p>
+                                    <!-- 回复删除按钮 -->
+                            {% if current_user.is_authenticated and current_user.id == reply.user.id %}
+                            <form action="{{ url_for('blog.post.delete_comment', comment_id=reply.id) }}" method="POST" style="display: inline; margin-right: 10px;">
+                                <button type="submit" class="btn btn-sm btn-danger btn-action">
+                                    删除
+                                </button>
+                            </form>
+                            {% endif %}
+                                </div>
+                                <p class="text-muted small">
+                                    回复者: <a href="{{ url_for('blog.user.profile', user_id=reply.user.id) }}" class="text-muted">{{ reply.user.realname }}</a> | 回复时间: {{ reply.date_posted.strftime('%Y-%m-%d') }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% if not post.comments %}
+        <p class="text-muted">暂无评论</p>
+        {% endif %}
+    </div>
+    <hr>
+    <div class="comment-form text-left">
+        <h4>发表评论</h4>
+        <form method="POST" action="{{ url_for('blog.post.add_comment', post_id=post.id) }}">
+            <div class="form-group">
+                <textarea name="content" class="form-control" rows="4" placeholder="写下您的评论" required></textarea>
+                <div class="mt-2">
+                    <button type="button" class="btn btn-sm btn-outline-primary emoji-btn" onclick="toggleEmojiPicker('comment')">
+                    <i class="far fa-smile"></i> 表情
+                </button>
+                    <div id="emoji-picker-comment" class="emoji-picker" style="display: none; position: absolute; background: white; border: 1px solid #ddd; padding: 10px; border-radius: 4px; z-index: 1000; max-height: 200px; overflow-y: auto;"></div>
+                </div>
+            </div>
+            <div class="text-right">
+                <button type="submit" class="btn btn-primary mt-2" style="background-color: #00abe8; border-color: #00abe8;">提交评论</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// 提交评论表单的AJAX函数
+async function submitCommentForm(form) {
+    // 检查是否正在提交中
+    if (form.dataset.isSubmitting === 'true') {
+        return; // 已经在提交中，直接返回
+    }
+    
+    // 设置提交中标志
+    form.dataset.isSubmitting = 'true';
+    
+    // 禁用提交按钮并保存原始文本
+    const submitButton = form.querySelector('button[type="submit"]');
+    let originalText = '提交评论';
+    if (submitButton) {
+        originalText = submitButton.textContent;
+        submitButton.disabled = true;
+        submitButton.textContent = '提交中...';
+    }
+    
+    const formData = new FormData(form);
+    const url = form.action;
+    
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        if (response.ok) {
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                // 如果返回的是JSON响应
+                const data = await response.json();
+                if (data.code === 400) {
+                    alert(data.message);
+                    return;
+                }
+            } else {
+                // 获取返回的HTML片段
+                const html = await response.text();
+                
+                // 将新评论添加到评论列表中
+                const commentsContainer = document.querySelector('.comments');
+                if (commentsContainer) {
+                    // 检查是否是顶级评论还是回复
+                    if (form.action.includes('/comment/')) {
+                        // 是回复评论，需要找到父评论的回复列表
+                        const parentCommentId = form.action.match(/comment\/(\d+)\/reply/)[1];
+                        const parentComment = commentsContainer.querySelector(`#reply-form-${parentCommentId}`).closest('.card');
+                        if (parentComment) {
+                            parentComment.insertAdjacentHTML('beforeend', html);
+                            // 重新初始化评论功能，为新添加的回复绑定事件监听器
+                            initCommentFunctions();
+                            // 为新添加的回复添加动画效果
+                            const newReply = parentComment.lastElementChild;
+                            setTimeout(() => {
+                                newReply.style.opacity = '1';
+                                newReply.style.transform = 'translateY(0)';
+                            }, 10);
+                        }
+                    } else {
+                        // 是顶级评论，直接添加到评论列表
+                        commentsContainer.insertAdjacentHTML('beforeend', html);
+                        // 重新初始化评论功能，为新添加的评论绑定事件监听器
+                        initCommentFunctions();
+                        // 为新添加的评论添加动画效果
+                        const newComment = commentsContainer.lastElementChild;
+                        setTimeout(() => {
+                            newComment.style.opacity = '1';
+                            newComment.style.transform = 'translateY(0)';
+                        }, 10);
+                    }
+                    
+                    // 清空评论表单
+                    form.querySelector('textarea[name="content"]').value = '';
+                }
+            }
+        } else {
+            throw new Error('评论提交失败');
+        }
+    } catch (error) {
+        console.error('评论提交出错:', error);
+        alert('评论提交失败，请稍后重试');
+    } finally {
+        // 恢复表单和按钮状态
+        form.dataset.isSubmitting = 'false';
+        const submitButton = form.querySelector('button[type="submit"]');
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = originalText;
+        }
+    }
+}
+
+// 删除评论的AJAX函数
+async function deleteComment(form) {
+    // 检查是否正在删除中
+    if (form.dataset.isDeleting === 'true') {
+        return false; // 已经在删除中，直接返回
+    }
+    
+    if (!confirm('确定要删除这条评论吗？')) {
+        return false;
+    }
+    
+    // 设置删除中标志
+    form.dataset.isDeleting = 'true';
+    
+    // 禁用删除按钮
+    const deleteButton = form.querySelector('button[type="submit"]');
+    let originalText = '删除';
+    if (deleteButton) {
+        originalText = deleteButton.textContent;
+        deleteButton.disabled = true;
+        deleteButton.textContent = '删除中...';
+    }
+    
+    const url = form.action;
+    
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        if (response.ok) {
+            // 解析JSON响应
+            const data = await response.json();
+            if (data.code === 200) {
+                // 从DOM中移除对应的评论元素
+                const commentElement = form.closest('.card');
+                if (commentElement) {
+                    // 添加淡出动画
+                    commentElement.style.transition = 'opacity 0.3s ease-in-out';
+                    commentElement.style.opacity = '0';
+                    
+                    // 动画结束后移除元素
+                    setTimeout(() => {
+                        commentElement.remove();
+                    }, 300);
+                }
+            } else {
+                alert(data.message);
+            }
+        } else {
+            throw new Error('评论删除失败');
+        }
+    } catch (error) {
+        console.error('评论删除出错:', error);
+        alert('评论删除失败，请稍后重试');
+    } finally {
+        // 恢复表单和按钮状态
+        form.dataset.isDeleting = 'false';
+        const deleteButton = form.querySelector('button[type="submit"]');
+        if (deleteButton) {
+            deleteButton.disabled = false;
+            deleteButton.textContent = originalText;
+        }
+    }
+    
+    return false;
+}
+
+// 评论表单提交事件处理函数
+function handleCommentFormSubmit(e) {
+    e.preventDefault();
+    submitCommentForm(e.target);
+}
+
+// 删除评论表单提交事件处理函数
+function handleDeleteCommentSubmit(e) {
+    e.preventDefault();
+    deleteComment(e.target);
+}
+
+// 初始化评论功能
+function initCommentFunctions() {
+    // 绑定主评论表单提交事件
+    const mainCommentForm = document.querySelector('.comment-form form');
+    if (mainCommentForm) {
+        // 先移除可能存在的旧事件监听器
+        mainCommentForm.removeEventListener('submit', handleCommentFormSubmit);
+        // 添加新的事件监听器
+        mainCommentForm.addEventListener('submit', handleCommentFormSubmit);
+    }
+    
+    // 绑定所有删除评论表单提交事件
+    const deleteCommentForms = document.querySelectorAll('form');
+    deleteCommentForms.forEach(form => {
+        // 检查表单是否包含删除按钮
+        const deleteButton = form.querySelector('button[type="submit"]');
+        if (deleteButton && deleteButton.textContent.trim() === '删除') {
+            form.removeEventListener('submit', handleDeleteCommentSubmit);
+            form.addEventListener('submit', handleDeleteCommentSubmit);
+        }
+    });
+    
+    // 绑定所有回复表单提交事件
+    const replyForms = document.querySelectorAll('[id^="reply-form-"] form');
+    replyForms.forEach(form => {
+        form.removeEventListener('submit', handleCommentFormSubmit);
+        form.addEventListener('submit', handleCommentFormSubmit);
+    });
+}
+
+// 页面加载完成后初始化
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCommentFunctions);
+} else {
+    initCommentFunctions();
+}
+
+// 监听SPA页面加载事件，确保动态加载内容后重新初始化
+if (typeof window.SPARouter !== 'undefined') {
+    document.addEventListener('spa-page-loaded', initCommentFunctions);
+}
+
+// 收藏功能
+async function toggleFavorite(button) {
+    // 检查是否有URL，如果没有说明用户未登录
+    if (!button.dataset.url) {
+        // 使用layer.msg显示提示信息
+        if (window.layer) {
+            window.layer.msg('请先到个人中心登录', {
+                icon: -1, // 不显示图标
+                closeBtn: 1, // 右上角显示关闭按钮
+                time: 3000, // 3秒后自动关闭
+                area: ['280px', 'auto'], // 固定宽度
+                shade: [0.1, '#393D49'], // 半透明遮罩
+                offset: 'center', // 居中显示
+                zIndex: 9999 // 最高层级
+            });
+        } else {
+            console.log('请先到个人中心登录');
+        }
+        return;
+    }
+    
+    const url = button.dataset.url;
+    const action = button.dataset.action;
+    const postId = button.dataset.postId;
+    
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        if (response.ok) {
+            // 直接更新按钮状态和文本，不重新加载页面
+            if (action === 'favorite') {
+                // 更新为已收藏状态
+                button.className = 'btn btn-danger btn-sm favorite-btn';
+                button.innerHTML = '<i class="fas fa-heart"></i> 已收藏';
+                button.dataset.action = 'unfavorite';
+                button.dataset.url = button.dataset.url.replace('favorite', 'unfavorite');
+            } else {
+                // 更新为未收藏状态
+                button.className = 'btn btn-outline-danger btn-sm favorite-btn';
+                button.innerHTML = '<i class="far fa-heart"></i> 收藏';
+                button.dataset.action = 'favorite';
+                button.dataset.url = button.dataset.url.replace('unfavorite', 'favorite');
+            }
+        } else if (response.status === 401) {
+            // 处理未登录情况
+            const data = await response.json();
+            if (window.layer) {
+                window.layer.msg(data.message, {icon: 2});
+            } else {
+                console.log(data.message);
+            }
+        } else {
+            throw new Error(action === 'favorite' ? '收藏失败' : '取消收藏失败');
+        }
+    } catch (error) {
+        console.error('收藏操作出错:', error);
+        if (window.layer) {
+            window.layer.msg('操作失败，请稍后重试', {icon: 2});
+        }
+    }
+}
+
+// 初始化收藏功能
+function initFavoriteFunctions() {
+    // 绑定所有收藏按钮点击事件
+    const favoriteButtons = document.querySelectorAll('.favorite-btn');
+    favoriteButtons.forEach(button => {
+        // 移除可能存在的旧事件监听器
+        button.removeEventListener('click', handleFavoriteClick);
+        // 添加新的事件监听器
+        button.addEventListener('click', handleFavoriteClick);
+    });
+}
+
+// 收藏按钮点击事件处理函数
+function handleFavoriteClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    // 获取真正的按钮元素（可能点击的是按钮内的图标或文本）
+    const button = e.currentTarget;
+    toggleFavorite(button);
+}
+
+// 页面加载完成后初始化收藏功能
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFavoriteFunctions);
+} else {
+    initFavoriteFunctions();
+}
+
+// 监听SPA页面加载事件，确保动态加载内容后重新初始化收藏功能
+if (typeof window.SPARouter !== 'undefined') {
+    document.addEventListener('spa-page-loaded', initFavoriteFunctions);
+}
+
+// 点赞功能
+async function toggleLike(button) {
+    // 检查是否有URL，如果没有说明用户未登录
+    if (!button.dataset.url) {
+        // 使用layer.msg显示提示信息
+        if (window.layer) {
+            window.layer.msg('请先到个人中心登录', {
+                icon: -1, // 不显示图标
+                closeBtn: 1, // 右上角显示关闭按钮
+                time: 3000, // 3秒后自动关闭
+                area: ['280px', 'auto'], // 固定宽度
+                shade: [0.1, '#393D49'], // 半透明遮罩
+                offset: 'center', // 居中显示
+                zIndex: 9999 // 最高层级
+            });
+        } else {
+            console.log('请先到个人中心登录');
+        }
+        return;
+    }
+    
+    const url = button.dataset.url;
+    const action = button.dataset.action;
+    const postId = button.dataset.postId;
+    
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            // 直接更新按钮状态和文本，不重新加载页面
+            if (action === 'like') {
+                // 更新为已点赞状态
+                button.className = 'btn btn-primary btn-sm like-btn';
+                button.innerHTML = '<i class="fas fa-thumbs-up"></i> 已点赞 <span class="like-count">' + data.like_count + '</span>';
+                button.dataset.action = 'unlike';
+                button.dataset.url = button.dataset.url.replace('like', 'unlike');
+            } else {
+                // 更新为未点赞状态
+                button.className = 'btn btn-outline-primary btn-sm like-btn';
+                button.innerHTML = '<i class="far fa-thumbs-up"></i> 点赞 <span class="like-count">' + data.like_count + '</span>';
+                button.dataset.action = 'like';
+                button.dataset.url = button.dataset.url.replace('unlike', 'like');
+            }
+        } else if (response.status === 401) {
+            // 处理未登录情况
+            const data = await response.json();
+            if (window.layer) {
+                window.layer.msg(data.message, {icon: 2});
+            } else {
+                console.log(data.message);
+            }
+        } else {
+            throw new Error(action === 'like' ? '点赞失败' : '取消点赞失败');
+        }
+    } catch (error) {
+        console.error('点赞操作出错:', error);
+        if (window.layer) {
+            window.layer.msg('操作失败，请稍后重试', {icon: 2});
+        }
+    }
+}
+
+// 初始化点赞功能
+function initLikeFunctions() {
+    // 绑定所有点赞按钮点击事件
+    const likeButtons = document.querySelectorAll('.like-btn');
+    likeButtons.forEach(button => {
+        // 移除可能存在的旧事件监听器
+        button.removeEventListener('click', handleLikeClick);
+        // 添加新的事件监听器
+        button.addEventListener('click', handleLikeClick);
+    });
+}
+
+// 点赞按钮点击事件处理函数
+function handleLikeClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    // 获取真正的按钮元素（可能点击的是按钮内的图标或文本）
+    const button = e.currentTarget;
+    toggleLike(button);
+}
+
+// 页面加载完成后初始化点赞功能
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initLikeFunctions);
+} else {
+    initLikeFunctions();
+}
+
+// 监听SPA页面加载事件，确保动态加载内容后重新初始化点赞功能
+if (typeof window.SPARouter !== 'undefined') {
+    document.addEventListener('spa-page-loaded', initLikeFunctions);
+}
+</script>
+
+<style>
+/* 评论操作按钮样式 */
+.btn-action {
+    transition: transform 0.2s ease;
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 12px;
+    text-decoration: none;
+}
+
+.btn-action:hover {
+    transform: scale(1.1);
+    text-decoration: none;
+}
+
+/* 确保按钮文本颜色在悬浮时不变 */
+.btn-primary.btn-action:hover {
+    color: white;
+}
+
+.btn-danger.btn-action:hover {
+    color: white;
+}
+
+/* 表情按钮样式 */
+.emoji-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6c757d;
+    background-color: transparent;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    width: auto;
+    height: auto;
+}
+
+.emoji-btn:hover {
+    color: #fff;
+    background-color: #ff6b6b;
+    border-color: #ff6b6b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(255, 107, 107, 0.25);
+    cursor: pointer;
+}
+
+.emoji-btn i {
+    font-size: 16px;
+    pointer-events: none;
+}
+
+.emoji-btn span {
+    pointer-events: none;
+}
+
+/* 表情选择器样式 */
+.emoji-picker {
+    border-radius: 12px !important;
+    border: 1px solid #e0e0e0 !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+    padding: 15px !important;
+    max-height: 250px !important;
+    background: linear-gradient(to bottom right, #ffffff, #f8f9fa) !important;
+}
+
+.emoji-picker span {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    text-align: center;
+    line-height: 32px;
+    border-radius: 6px;
+    margin: 2px;
+    transition: all 0.2s ease;
+}
+
+.emoji-picker span:hover {
+    background-color: #ffecec;
+    transform: scale(1.3);
+    z-index: 1001;
+    position: relative;
+}
+
+/* 回复表情按钮样式 */
+.comment-form .emoji-btn,
+[id^="reply-form-"] .emoji-btn {
+    margin-bottom: 10px;
+}
+
+/* 确保表情按钮在表单中正确对齐 */
+.form-group .mt-2 {
+    display: flex;
+    align-items: center;
+}
+
+/* 改进表情图标显示 */
+.far.fa-smile {
+    transition: transform 0.3s ease;
+}
+
+.emoji-btn:hover .far.fa-smile {
+    transform: rotate(15deg) scale(1.2);
+}
+</style>
+
+<script>
+// 表情符号数组
+var emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐', '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕', '🤑', '🤠', '😈', '👿', '👹', '👺', '🤡', '💩', '👻', '💀', '☠️', '👽', '👾', '🤖', '🎃', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾'];
+
+// 初始化所有表情选择器
+function initAllEmojiPickers() {
+    // 初始化评论表情选择器
+    initEmojiPicker('comment');
+    
+    // 初始化回复表情选择器
+    var replyForms = document.querySelectorAll('[id^="reply-form-"]');
+    replyForms.forEach(function(form) {
+        var commentId = form.id.replace('reply-form-', '');
+        initEmojiPicker('reply-' + commentId);
+    });
+}
+
+// 页面加载完成后初始化
+window.onload = function() {
+    initAllEmojiPickers();
+};
+
+// 监听SPA页面加载事件，确保动态加载内容后重新初始化表情选择器
+if (typeof window.SPARouter !== 'undefined') {
+    document.addEventListener('spa-page-loaded', function() {
+        // 延迟一下确保DOM已经完全加载
+        setTimeout(initAllEmojiPickers, 100);
+    });
+}
+
+// 初始化表情选择器
+function initEmojiPicker(type) {
+    var picker = document.getElementById('emoji-picker-' + type);
+    if (picker.innerHTML === '') {
+        emojis.forEach(function(emoji) {
+            var emojiSpan = document.createElement('span');
+            emojiSpan.textContent = emoji;
+            emojiSpan.style.cursor = 'pointer';
+            emojiSpan.style.fontSize = '20px';
+            emojiSpan.style.margin = '2px';
+            emojiSpan.onclick = function() {
+                insertEmoji(type, emoji);
+            };
+            picker.appendChild(emojiSpan);
+        });
+    }
+}
+
+// 显示/隐藏表情选择器
+function toggleEmojiPicker(type) {
+    var picker = document.getElementById('emoji-picker-' + type);
+    if (picker.style.display === 'none' || picker.style.display === '') {
+        // 隐藏所有其他表情选择器
+        var allPickers = document.querySelectorAll('.emoji-picker');
+        allPickers.forEach(function(p) {
+            p.style.display = 'none';
+        });
+        
+        // 初始化表情选择器内容
+        initEmojiPicker(type);
+        
+        // 显示当前表情选择器
+        picker.style.display = 'block';
+    } else {
+        picker.style.display = 'none';
+    }
+}
+
+// 将表情插入到文本区域
+function insertEmoji(type, emoji) {
+    var textarea;
+    if (type === 'comment') {
+        textarea = document.querySelector('.comment-form textarea');
+    } else {
+        var commentId = type.replace('reply-', '');
+        textarea = document.querySelector('#reply-form-' + commentId + ' textarea');
+    }
+    
+    if (textarea) {
+        // 获取光标位置
+        var startPos = textarea.selectionStart;
+        var endPos = textarea.selectionEnd;
+        var scrollTop = textarea.scrollTop;
+        
+        // 插入表情
+        var text = textarea.value;
+        textarea.value = text.substring(0, startPos) + emoji + text.substring(endPos, text.length);
+        
+        // 恢复光标位置
+        textarea.focus();
+        textarea.selectionStart = startPos + emoji.length;
+        textarea.selectionEnd = startPos + emoji.length;
+        textarea.scrollTop = scrollTop;
+    }
+    
+    // 隐藏表情选择器
+    toggleEmojiPicker(type);
+}
+
+// 点击页面其他地方隐藏表情选择器
+document.addEventListener('click', function(e) {
+    if (!e.target.classList.contains('emoji-btn') && !e.target.closest('.emoji-picker')) {
+        var allPickers = document.querySelectorAll('.emoji-picker');
+        allPickers.forEach(function(picker) {
+            picker.style.display = 'none';
+        });
+    }
+});
+
+function toggleReplyForm(commentId) {
+    var form = document.getElementById('reply-form-' + commentId);
+    if (form.style.display === 'none' || form.style.display === '') {
+        form.style.display = 'block';
+        // 初始化回复表情选择器
+        initEmojiPicker('reply-' + commentId);
+    } else {
+        form.style.display = 'none';
+        // 隐藏回复表情选择器
+        var picker = document.getElementById('emoji-picker-reply-' + commentId);
+        if (picker) {
+            picker.style.display = 'none';
+        }
+    }
+}
+</script>
+{% endblock %}

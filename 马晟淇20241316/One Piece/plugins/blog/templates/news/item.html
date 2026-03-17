@@ -1,0 +1,60 @@
+{% extends "common/base.html" %}
+
+{% block title %}{{ article.title }} - 新闻{% endblock %}
+
+{% block main %}
+    <!DOCTYPE html>
+    <html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ article.title }} - 新闻</title>
+        <link href="{{ url_for('static', filename='blog/css/news-item.css') }}" rel="stylesheet">
+    </head>
+    <body>
+    <div class="container p-5 bg-white">
+        <!-- 新闻标题 -->
+        <h1 class="news-title text-center">{{ article.title }}</h1>
+
+        <!-- 新闻发布信息 -->
+      <div class="news-meta">
+    <!-- 格式化新闻发布日期 -->
+    <span class="news-date">{{ article.release_date.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+
+    {% if article.category_name %}
+        <span class="news-category">{{ article.category_name }}</span>
+    {% endif %}
+
+    {% if article.category_2_name %}
+        <span class="news-subcategory">{{ article.category_2_name }}</span>
+    {% endif %}
+</div>
+
+        <!-- 新闻封面图 -->
+{#        {% if article.cover %}#}
+{#            <div class="news-cover">#}
+{#                {% if article.cover.startswith('http') %}#}
+{#                    <img src="{{ article.cover }}" alt="Cover image" class="img-fluid">#}
+{#                {% else %}#}
+{#                    <img src="{{ url_for('static', filename='images/' + article.cover) }}" alt="Cover image"#}
+{#                         class="img-fluid">#}
+{#                {% endif %}#}
+{#            </div>#}
+{#        {% endif %}#}
+
+        <!-- 文章内容 -->
+        <div class="news-content">
+            {{ article.article | safe }}
+        </div>
+
+        <!-- 文章链接 -->
+        {% if article.link %}
+            <div class="news-link">
+                <a href="{{ article.link }}" target="_blank" class="btn btn-primary">阅读原文</a>
+            </div>
+        {% endif %}
+    </div>
+
+    </body>
+    </html>
+{% endblock %}

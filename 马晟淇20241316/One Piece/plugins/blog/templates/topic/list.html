@@ -1,0 +1,188 @@
+{% extends "common/base.html" %}
+
+{% block title %}海贼王 - 篇章故事{% endblock %}
+
+{% block header %}
+    <header class="aos-init" data-aos="header-slide-left" style="margin-bottom: 30px; width: 100%; background-color: #f9523c; position: relative;">
+        <img src="{{ url_for('static', filename='blog/images/strawhatcrew_mv_pc.png') }}" alt="One Piece Header" style="display: block; margin: 0 auto; width: 45vw !important; height: auto; object-fit: contain;"/>
+    </header>
+{% endblock %}
+
+{% block main %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='blog/css/module.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='blog/css/template.min.css') }}">
+
+    <style>
+        /* 设置页面背景颜色 */
+        body {
+            background-color: #f4efe6;
+        }
+        
+        /* 设置h2标题文字部分背景颜色、阴影、字号和圆角 */
+        h2 {
+            display: inline;
+            background-color: #fffae8;
+            padding: 0 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            font-size: 2em;
+            font-weight: bold;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        /* 自定义动画：整个header从中间向左移动 */
+        @keyframes headerSlideLeft {
+            0% {
+                transform: translateX(50%);
+            }
+            100% {
+                transform: translateX(0);
+            }
+        }
+        
+        /* 将动画应用到header元素 */
+        header[data-aos="header-slide-left"] {
+            opacity: 0;
+            animation-fill-mode: both;
+        }
+        
+        header[data-aos="header-slide-left"].aos-animate {
+            opacity: 1;
+            animation: headerSlideLeft 1.3s ease-in-out forwards;
+        }
+        
+        /* 分页样式调整：移除蓝色和下划线 */
+        .page-link {
+            color: inherit !important;
+            text-decoration: none !important;
+        }
+        
+        .page-item.active .page-link {
+            color: white !important;
+            text-decoration: none !important;
+        }
+        
+        .page-link:hover {
+            text-decoration: none !important;
+        }
+    </style>
+
+    <section data-layout-width="large">
+        <h2>ストーリー一覧</h2>
+
+        <!-- 排序选择器 -->
+        <div style="text-align: right; margin-bottom: 20px; padding: 0 15px;">
+            <label style="margin-right: 10px;">排序方式：</label>
+            <select id="sortSelect" onchange="changeSort(this.value)" style="padding: 8px 15px; border-radius: 5px; border: 1px solid #ddd; cursor: pointer;">
+                <option value="desc" {% if current_sort == 'desc' %}selected{% endif %}>最新优先（降序）</option>
+                <option value="asc" {% if current_sort == 'asc' %}selected{% endif %}>最早优先（升序）</option>
+            </select>
+        </div>
+
+        <div class="el-card-block" data-column="s1-m4-l4" data-card-type="default" data-img-trim="true">
+            <ul class="el-card-block__list">
+                {% for article in articles %}
+                <li class="el-card-block__item">
+                    <a href="{{ url_for('blog.topic.item', id=article.id) }}" class="el-card-block__container">
+                        <div class="el-card-block__pic">
+                            <div class="el-card-block__pic__inner">
+                                <picture>
+                                    <img src="{{ article.cover or url_for('static', filename='picture/default_topic.png') }}" width="1280" height="854" loading="lazy" alt="{{ article.title }}">
+                                </picture>
+                            </div>
+                        </div>
+                        <div class="el-card-block__txt">
+                            <div class="el-card-block__txt__inner">
+                                <div class="el-heading-lv3">
+                                    <div class="el-heading-lv3__holder">
+                                        <div class="el-heading-lv3__container">
+                                            <h3>{{ article.title }}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="el-list-term">
+                                    <div class="el-list-term__list">
+                                        {% if article.original_work %}
+                                        <dl class="el-list-term__item">
+                                            <dt class="el-list-term__head"><span>原作</span></dt>
+                                            <dd class="el-list-term__body">
+                                                <div class="el-paragraph">
+                                                    <p>{{ article.original_work }}</p>
+                                                </div>
+                                            </dd>
+                                        </dl>
+                                        {% endif %}
+                                        {% if article.anime %}
+                                        <dl class="el-list-term__item">
+                                            <dt class="el-list-term__head"><span>アニメ</span></dt>
+                                            <dd class="el-list-term__body">
+                                                <div class="el-paragraph">
+                                                    <p>{{ article.anime }}</p>
+                                                </div>
+                                            </dd>
+                                        </dl>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- 分页导航 -->
+        {% if pagination and pagination.pages > 1 %}
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if pagination.has_prev %}
+                <li class="page-item"><a class="page-link" href="#" data-page="{{ pagination.prev_num }}">上一页</a></li>
+                {% endif %}
+                {% for page in pagination.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
+                <li class="page-item {% if page == pagination.page %}active{% endif %}">
+                    <a class="page-link" href="#" data-page="{{ page }}"> {% if page ==None %} ... {% else %} {{ page }} {% endif %}</a>
+                </li>
+                {% endfor %}
+                {% if pagination.has_next %}
+                <li class="page-item"><a class="page-link" href="#" data-page="{{ pagination.next_num }}">下一页</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </section>
+
+    <script>
+        function changeSort(sortValue) {
+            // 使用SPA路由导航，避免音乐中断
+            const newPath = window.location.pathname + '?page=1&sort=' + sortValue;
+            if (window.spaApp && window.spaApp.router) {
+                window.spaApp.router.navigateTo(newPath);
+            } else {
+                window.location.href = newPath;
+            }
+        }
+        
+        // 处理分页链接点击事件 - 使用事件委托，确保动态生成的链接也能正常工作
+        document.addEventListener('click', function(e) {
+            const link = e.target.closest('.pagination .page-link[data-page]');
+            if (link) {
+                e.preventDefault();
+                const page = link.getAttribute('data-page');
+                if (!page || page === 'None') return;
+                
+                // 获取当前排序方式
+                const sortSelect = document.getElementById('sortSelect');
+                const sortValue = sortSelect ? sortSelect.value : 'desc';
+                
+                // 使用SPA路由导航，避免音乐中断
+                const newPath = window.location.pathname + '?page=' + page + '&sort=' + sortValue;
+                if (window.spaApp && window.spaApp.router) {
+                    window.spaApp.router.navigateTo(newPath);
+                } else {
+                    window.location.href = newPath;
+                }
+            }
+        });
+    </script>
+{% endblock %}

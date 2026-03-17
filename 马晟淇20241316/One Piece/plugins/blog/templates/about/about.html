@@ -1,0 +1,69 @@
+{% extends "common/base.html" %}
+
+{% block title %}海贼王-首页{% endblock %}
+{% block main %}
+<div class="container py-5">
+    <!-- 标题 -->
+    <h1 class="text-center mb-4 display-4">关于我们</h1>
+
+    <!-- 第一部分：图片和介绍 -->
+    <div class="row align-items-center mb-5">
+        <!-- 图片 -->
+        <div class="col-md-6 text-center">
+            <img src="{{ url_for('static', filename='picture/logo.png') }}"
+                 class="img-fluid rounded shadow"
+                 alt="logo" />
+        </div>
+        <!-- 文本 -->
+        <div class="col-md-6">
+            <p class="lead">
+                海贼王网站致力于为所有粉丝提供最全面、最深入的海贼王相关信息。我们涵盖了以下内容：
+            </p>
+        </div>
+    </div>
+
+    <!-- 第二部分：列表 -->
+    <div class="mb-5">
+        <ul class="list-group list-group-flush shadow-sm">
+{#            <li class="list-group-item bg-dark h5">#}
+{#                <strong>海贼王系列的历史和年表：</strong>了解从初期到最新每篇章节的登场故事。#}
+{#            </li>#}
+{#            <li class="list-group-item bg-dark h5">#}
+{#                <strong>角色和剧情分析：</strong>深度解读经典角色和精彩故事情节。#}
+{#            </li>#}
+            <li class="list-group-item bg-dark h5">
+                <strong>新闻：</strong>获取海贼王系列的最新动态和官方发布。
+            </li>
+            <li class="list-group-item bg-dark h5">
+                <strong>个人博客：</strong>分享自己的海贼王故事，并与其他粉丝互动。
+            </li>
+            <li class="list-group-item bg-dark h5">
+                <strong>系列：</strong>从路飞开始，探索每个角色的故事。
+            </li>
+            <li class="list-group-item bg-dark h5">
+                <strong>篇章故事：</strong>探索海贼王世界的精彩篇章，发现更多独特内容。
+            </li>
+            <li class="list-group-item bg-dark h5">
+                <strong>漫画：</strong>欣赏精美的海贼王插图和系列官方海报。
+            </li>
+        </ul>
+    </div>
+
+    <!-- 第三部分：图片和联系信息 -->
+    <div class="row align-items-center">
+        <!-- 文本 -->
+        <div class="col-md-8">
+            <p class="lead">
+                我们的目标是创建一个温馨的粉丝社区，让每一位海贼王爱好者都能找到属于自己的内容。如果您对网站有任何建议或想法，请通过我们的
+                <a href="{{ url_for('blog.about.concat') }}" class="text-primary">联系我们页面</a>反馈给我们。
+            </p>
+        </div>
+        <!-- 图片 -->
+        <div class="col-md-4 text-center">
+            <img src="{{ url_for('static', filename='blog/images/bg/bg3.jpg') }}"
+                 class="img-fluid rounded shadow"
+                 alt="海贼王图片" />
+        </div>
+    </div>
+</div>
+{% endblock %}

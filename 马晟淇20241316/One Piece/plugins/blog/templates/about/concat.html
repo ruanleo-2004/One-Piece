@@ -1,0 +1,162 @@
+{% extends "common/base.html" %}
+
+{% block title %}海贼王-联系我们{% endblock %}
+{% block main %}
+<!-- InstanceBeginEditable name="main" -->
+  <style>
+    body {
+      background-color: #f4efe6;
+      color: #000000;
+    }
+    .contact-container {
+      min-width: 320px;
+      max-width: 800px;
+      width: 100%;
+      margin: 50px auto;
+      padding: 30px;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-sizing: border-box;
+    }
+    .contact-container:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+    .form-control, .btn {
+      border-radius: 5px;
+    }
+    .btn-primary {
+      background-color: #ff5722;
+      border-color: #ff5722;
+    }
+    .btn-primary:hover {
+      background-color: #e64a19;
+      border-color: #e64a19;
+    }
+  </style>
+{#    <div class="container text-center">#}
+{#    {% with messages = get_flashed_messages(with_categories=true) %}#}
+{#      {% if messages %}#}
+{#        <div class="alert alert-{{ messages[0][0] }} alert-dismissible fade show" role="alert">#}
+{#          {{ messages[0][1] }}#}
+{#          <button type="button" class="close" data-dismiss="alert" aria-label="Close">#}
+{#            <span aria-hidden="true">&times;</span>#}
+{#          </button>#}
+{#        </div>#}
+{#      {% endif %}#}
+{#    {% endwith %}</div>#}
+  {# 隐藏操作提示框 #}
+  {# <div class="container text-center">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="alert alert-{{ messages[0][0] }} alert-dismissible fade show" role="alert">
+          {{ messages[0][1] }}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      {% endif %}
+    {% endwith %}
+    </div> #}
+  <div class="container contact-container">
+    <h1 class="text-center mb-4">联系我们</h1>
+    <p class="text-center mb-4">我们非常重视您的反馈，请填写以下表单与我们取得联系。</p>
+
+
+
+    <form action="{{ url_for('blog.about.concat') }}" method="POST" enctype="multipart/form-data">
+      {{ form.hidden_tag() }}
+      <!-- 用户信息 -->
+      <div class="form-group">
+        <label for="name">{{ form.name.label.text }}</label>
+        {{ form.name(class="form-control", placeholder="请输入您的姓名") }}
+        {% if form.name.errors %}
+          <div class="text-danger">
+            {% for error in form.name.errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+      <div class="form-group">
+        <label for="email">{{ form.email.label.text }}</label>
+        {{ form.email(class="form-control", placeholder="请输入您的电子邮件") }}
+        {% if form.email.errors %}
+          <div class="text-danger">
+            {% for error in form.email.errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+      <div class="form-group">
+        <label for="phone">{{ form.phone.label.text }}</label>
+        {{ form.phone(class="form-control", placeholder="请输入您的联系电话") }}
+        {% if form.phone.errors %}
+          <div class="text-danger">
+            {% for error in form.phone.errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- 反馈类别 -->
+      <div class="form-group">
+        <label for="category">{{ form.category.label.text }}</label>
+        {{ form.category(class="form-control") }}
+        {% if form.category.errors %}
+          <div class="text-danger">
+            {% for error in form.category.errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- 消息内容 -->
+      <div class="form-group">
+        <label for="message">{{ form.message.label.text }}</label>
+        {{ form.message(class="form-control", rows="5", placeholder="请输入您的反馈内容") }}
+        {% if form.message.errors %}
+          <div class="text-danger">
+            {% for error in form.message.errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- 附件上传 -->
+      <div class="form-group">
+        <label for="attachment">{{ form.attachment.label.text }}</label>
+        {{ form.attachment(class="form-control-file") }}
+        {% if form.attachment.errors %}
+          <div class="text-danger">
+            {% for error in form.attachment.errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- 同意条款 -->
+      <div class="form-check mb-4">
+        {{ form.agree(class="form-check-input") }}
+        <label class="form-check-label" for="agree">我已阅读并同意 <a href="{{ url_for('blog.about.terms') }}" class="text-warning">服务条款</a></label>
+        {% if form.agree.errors %}
+          <div class="text-danger">
+            {% for error in form.agree.errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- 提交按钮 -->
+      <button type="submit" class="btn btn-primary btn-block">提交反馈</button>
+    </form>
+  </div>
+{% endblock %}

@@ -1,0 +1,288 @@
+{% extends "common/base.html" %}
+
+{% block title %}海贼王 - 博客列表{% endblock %}
+
+{% block main %}
+<div class="container my-4">
+    <h1 class="text-center mb-4">博客文章列表</h1>
+    
+    <!-- 搜索表单 -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-8">
+            <form id="search-form" class="row g-3">
+                <div class="col-md-5">
+                    <input type="text" name="search" class="form-control" placeholder="搜索文章标题或内容" value="{{ search if search else '' }}">
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="author" class="form-control" placeholder="搜索作者" value="{{ author if author else '' }}">
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn w-100 rounded-pill shadow-lg scale-on-hover" style="background-color: #00abe8; border-color: #00abe8; color: white;">
+                        <i class="fas fa-search me-2"></i>搜索
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+    // 搜索功能
+    document.getElementById('search-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const searchInput = this.querySelector('input[name="search"]');
+        const authorInput = this.querySelector('input[name="author"]');
+        
+        const searchQuery = searchInput.value.trim();
+        const authorQuery = authorInput.value.trim();
+        
+        // 构建查询参数
+        let queryParams = [];
+        if (searchQuery) {
+            queryParams.push(`search=${encodeURIComponent(searchQuery)}`);
+        }
+        if (authorQuery) {
+            queryParams.push(`author=${encodeURIComponent(authorQuery)}`);
+        }
+        
+        // 构建URL路径
+        const path = '/blog/post' + (queryParams.length > 0 ? `?${queryParams.join('&')}` : '');
+        
+        // 使用SPA路由进行导航
+        if (typeof window.spaApp !== 'undefined' && window.spaApp.router) {
+            window.spaApp.router.navigateTo(path);
+        } else if (typeof window.router !== 'undefined') {
+            window.router.navigateTo(path);
+        } else {
+            // 如果没有SPA路由，使用传统方式
+            window.location.href = path;
+        }
+    });
+
+    // 点赞按钮事件处理
+    $(document).ready(function() {
+        $('.like-link').on('click', function(e) {
+            e.preventDefault();
+            
+            var $link = $(this);
+            var postId = $link.data('post-id');
+            var isLiked = $link.data('is-liked');
+            
+            // 检查用户是否已登录（通过检查is-liked属性是否存在）
+            if (typeof isLiked === 'undefined') {
+                // 用户未登录，直接显示提示
+                layer.msg('请先到个人中心登录', {
+                    icon: -1, // 不显示图标
+                    closeBtn: 1, // 右上角显示关闭按钮
+                    time: 3000, // 3秒后自动关闭
+                    area: ['280px', 'auto'], // 固定宽度
+                    shade: [0.1, '#393D49'], // 半透明遮罩
+                    offset: 'center', // 居中显示
+                    zIndex: 9999 // 最高层级
+                });
+                return;
+            }
+            
+            // 发送AJAX请求
+            var url = isLiked ? '/blog/post/' + postId + '/unlike' : '/blog/post/' + postId + '/like';
+            
+            $.ajax({
+                url: url,
+                type: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function(response) {
+                    // 更新按钮状态和点赞数量
+                    if (isLiked) {
+                        // 取消点赞
+                        $link.removeClass('text-primary').addClass('text-muted');
+                        $link.find('i').removeClass('fas').addClass('far');
+                        $link.attr('title', '点赞');
+                        $link.data('is-liked', false);
+                    } else {
+                        // 点赞
+                        $link.removeClass('text-muted').addClass('text-primary');
+                        $link.find('i').removeClass('far').addClass('fas');
+                        $link.attr('title', '取消点赞');
+                        $link.data('is-liked', true);
+                    }
+                    // 更新点赞数量
+                    $link.find('.like-count').text(response.like_count);
+                },
+                error: function(xhr, status, error) {
+                    console.error('点赞操作失败:', error);
+                    // 处理未登录情况
+                    if (xhr.status === 401) {
+                        // 解析JSON响应
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            layer.msg(response.message, {icon: 2});
+                        } catch (e) {
+                            layer.msg('请先到个人中心登录', {icon: 2});
+                        }
+                    } else {
+                        layer.msg('操作失败，请稍后重试', {icon: 2});
+                    }
+                }
+            });
+        });
+    });
+    </script>
+    
+    <div class="row g-4">
+        {% for post in posts.items %}
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card bg-white border-light h-100"  data-aos="fade-up" data-aos-duration="{{ 400*loop.index }}">
+                <!-- 图片区域 -->
+                {% if post.cover %}
+                <img src="{{ post.cover }}" alt="{{ post.title }}" class="card-img-top img-fluid" style="object-fit: cover; height: 200px;">
+                {% endif %}
+                <!-- 卡片主体 -->
+                <div class="card-body">
+                    <h5 class="card-title text-truncate">{{ post.title }}</h5>
+                    <p class="card-text text-truncate">{{ post.content|safe }}</p>
+                </div>
+                <!-- 卡片底部 -->
+                <div class="card-footer d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <a href="{{ url_for('blog.user.profile', user_id=post.get_author().id) }}">
+                            <img src="{{ post.get_author().avatar }}" alt="{{ post.get_author().realname }}" class="rounded-circle me-2" style="width: 40px; height: 40px; cursor: pointer;">
+                        </a>
+                        <div>
+                            <a href="{{ url_for('blog.user.profile', user_id=post.get_author().id) }}" class="text-muted">
+                                <small>{{ post.get_author().realname }}</small><br>
+                            </a>
+                            <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-3 align-items-center">
+                        {% if current_user.is_authenticated %}
+                            <a href="#" class="favorite-link {% if current_user.is_favoriting(post) %}text-danger{% else %}text-muted{% endif %}" 
+                               data-post-id="{{ post.id }}" data-is-favorited="{{ current_user.is_favoriting(post) }}" 
+                               title="{% if current_user.is_favoriting(post) %}取消收藏{% else %}收藏{% endif %}">
+                                <i class="{% if current_user.is_favoriting(post) %}fas{% else %}far{% endif %} fa-heart"></i>
+                            </a>
+                            <a href="#" class="like-link {% if current_user.is_liking(post) %}text-primary{% else %}text-muted{% endif %}" 
+                               data-post-id="{{ post.id }}" data-is-liked="{{ current_user.is_liking(post) }}" 
+                               title="{% if current_user.is_liking(post) %}取消点赞{% else %}点赞{% endif %}">
+                                <i class="{% if current_user.is_liking(post) %}fas{% else %}far{% endif %} fa-thumbs-up"></i>
+                                <span class="like-count">{{ post.get_like_count() }}</span>
+                            </a>
+                        {% else %}
+                            <a href="#" class="favorite-link text-muted" title="登录收藏" data-post-id="{{ post.id }}">
+                                <i class="far fa-heart"></i>
+                            </a>
+                            <a href="#" class="like-link text-muted" title="登录点赞" data-post-id="{{ post.id }}">
+                                <i class="far fa-thumbs-up"></i>
+                                <span class="like-count">{{ post.get_like_count() }}</span>
+                            </a>
+                        {% endif %}
+                        <a href="{{ url_for('blog.post.detail', post_id=post.id) }}" class="btn btn-sm scale-on-hover" style="background-color: #007bff; border-color: #007bff; color: white;">阅读全文</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <!-- 分页导航 -->
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if posts.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('blog.post.index', page=posts.prev_num, search=search, author=author) }}">上一页</a>
+            </li>
+            {% endif %}
+            {% for page in posts.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+            <li class="page-item {% if page == posts.page %}active{% endif %}">
+                <a class="page-link" href="{{ url_for('blog.post.index', page=page, search=search, author=author) }}">{{ page }}</a>
+            </li>
+            {% endfor %}
+            {% if posts.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('blog.post.index', page=posts.next_num, search=search, author=author) }}">下一页</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    
+    // 收藏按钮事件处理
+    $(document).ready(function() {
+        $('.favorite-link').on('click', function(e) {
+            e.preventDefault();
+            
+            var $link = $(this);
+            var postId = $link.data('post-id');
+            var isFavorited = $link.data('is-favorited');
+            
+            // 检查用户是否已登录（通过检查is-favorited属性是否存在）
+            if (typeof isFavorited === 'undefined') {
+                // 用户未登录，直接显示提示
+                layer.msg('请先到个人中心登录', {
+                    icon: -1, // 不显示图标
+                    closeBtn: 1, // 右上角显示关闭按钮
+                    time: 3000, // 3秒后自动关闭
+                    area: ['280px', 'auto'], // 固定宽度
+                    shade: [0.1, '#393D49'], // 半透明遮罩
+                    offset: 'center', // 居中显示
+                    zIndex: 9999 // 最高层级
+                });
+                return;
+            }
+            
+            // 发送AJAX请求
+            var url = isFavorited ? '/blog/post/' + postId + '/unfavorite' : '/blog/post/' + postId + '/favorite';
+            
+            $.ajax({
+                url: url,
+                type: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function(response) {
+                    // 更新按钮状态
+                    if (isFavorited) {
+                        $link.removeClass('text-danger').addClass('text-muted');
+                        $link.find('i').removeClass('fas').addClass('far');
+                        $link.attr('title', '收藏');
+                        $link.data('is-favorited', false);
+                    } else {
+                        $link.removeClass('text-muted').addClass('text-danger');
+                        $link.find('i').removeClass('far').addClass('fas');
+                        $link.attr('title', '取消收藏');
+                        $link.data('is-favorited', true);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('收藏操作失败:', error);
+                    // 处理未登录情况
+                    if (xhr.status === 401) {
+                        // 解析JSON响应
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            layer.msg(response.message, {icon: 2});
+                        } catch (e) {
+                            layer.msg('请先到个人中心登录', {icon: 2});
+                        }
+                    } else {
+                        layer.msg('操作失败，请稍后重试', {icon: 2});
+                    }
+                }
+            });
+        });
+    });
+    </script>
+    <style>
+        .scale-on-hover {
+            transition: transform 0.3s ease;
+        }
+        
+        .scale-on-hover:hover {
+            transform: scale(1.05);
+        }
+    </style>
+{% endblock %}

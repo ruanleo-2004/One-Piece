@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>编辑图片</title>
+    {% include 'system/common/header.html' %}
+</head>
+<body class="pear-container">
+<div class="layui-card">
+    <div class="layui-card-header">编辑图片</div>
+    <div class="layui-card-body">
+        <form class="layui-form" lay-filter="edit-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label">图片名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="image_name" required lay-verify="required" placeholder="请输入图片名称"
+                           class="layui-input" value="{{ image.image_name }}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">图片路径</label>
+                <div class="layui-input-block">
+                    <input type="text" name="image_path" placeholder="请输入图片路径或上传图片"
+                           class="layui-input" value="{{ image.image_path }}">
+                    <div style="margin-top: 10px;">
+                        <img src="{{ image.image_path }}" alt="当前图片" style="max-width: 200px; max-height: 200px;">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">上传图片</label>
+                <div class="layui-input-block">
+                    <input type="file" name="file" accept="image/*" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">描述信息</label>
+                <div class="layui-input-block">
+                    <textarea name="description" placeholder="请输入图片描述信息" class="layui-textarea">{{ image.description }}</textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">官网链接</label>
+                <div class="layui-input-block">
+                    <input type="url" name="url" placeholder="请输入官网链接地址，点击图片将跳转到此地址" class="layui-input" value="{{ image.url }}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="pear-btn pear-btn-primary" lay-submit lay-filter="save">保存</button>
+                    <button type="reset" class="pear-btn">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% include 'system/common/footer.html' %}
+<script>
+    layui.use(['form', 'jquery'], function () {
+        let form = layui.form;
+        let $ = layui.jquery;
+
+        form.on('submit(save)', function (data) {
+            // 创建FormData对象
+            let formData = new FormData();
+            formData.append('image_name', data.field.image_name);
+            formData.append('image_path', data.field.image_path);
+            formData.append('description', data.field.description);
+            formData.append('url', data.field.url);
+            
+            // 添加文件
+            let file = document.getElementsByName('file')[0].files[0];
+            if (file) {
+                formData.append('file', file);
+            }
+            
+            $.ajax({
+                url: "{{url_for('system.gallery.edit',id=id)}}", // 更新接口
+                type: 'POST',
+                contentType: false, // 不设置contentType
+                processData: false, // 不处理数据
+                data: formData,
+                success: function (res) {
+                    if (res.success) {
+                        layer.msg('更新成功', {icon: 1});
+                        parent.layui.table.reload('gallery-table'); // 刷新表格
+                        let index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index); // 关闭当前窗口
+                    } else {
+                        layer.msg('更新失败：' + res.message, {icon: 2});
+                    }
+                }
+            });
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

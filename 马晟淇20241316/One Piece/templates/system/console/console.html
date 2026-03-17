@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页</title>
+    {% include 'system/common/header.html' %}
+    <link href="{{ url_for('static', filename='blog/css/bootstrap-4.4.1.css') }}" rel="stylesheet"/>
+    <style>
+        /* Custom styling */
+        .top-panel-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #28333E;
+        }
+
+        #echarts-records {
+            width: 100%;
+            height: 350px;
+        }
+
+        .feedback-table th, .feedback-table td {
+            text-align: center;
+        }
+
+        .feedback-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .container {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body class="container">
+<div class="container">
+    <!-- Data Panel -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card">
+                <div class="card-header">当前推文数量</div>
+                <div class="card-body">
+                    <div class="top-panel-number" id="value1">
+                        {{ post_count }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card">
+                <div class="card-header">系列数量</div>
+                <div class="card-body">
+                    <div class="top-panel-number" id="value2">
+                        {{ series_count }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card">
+                <div class="card-header">新闻数量</div>
+                <div class="card-body">
+                    <div class="top-panel-number" id="value3">
+                        {{ news_count }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card">
+                <div class="card-header">用户数量</div>
+                <div class="card-body">
+                    <div class="top-panel-number" id="value4">
+                        {{ user_count }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ECharts Graph -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header">用户访问量</div>
+                <div class="card-body">
+                    <div id="echarts-records"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback List -->
+    <div class="container mt-4">
+        <h3>反馈列表</h3>
+        <table class="table table-bordered feedback-table">
+            <thead>
+                <tr>
+                    <th>姓名</th>
+                    <th>电子邮件</th>
+                    <th>电话</th>
+                    <th>类别</th>
+                    <th>信息</th>
+                    <th>附件</th>
+                    <th>同意</th>
+                    <th>提交时间</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for feedback in feedback_list %}
+                <tr>
+                    <td>{{ feedback.name }}</td>
+                    <td>{{ feedback.email }}</td>
+                    <td>{{ feedback.phone or '无' }}</td>
+                    <td>{{ feedback.category }}</td>
+                    <td>{{ feedback.message }}</td>
+                    <td>
+                        {% if feedback.attachment %}
+                        <a href="{{ feedback.attachment }}" target="_blank">查看附件</a>
+                        {% else %}
+                        无附件
+                        {% endif %}
+                    </td>
+                    <td>{{ '是' if feedback.agree else '否' }}</td>
+                    <td>{{ feedback.submitted_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% include 'system/common/footer.html' %}
+
+{#<script src="https://cdn.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>#}
+{#<script src="https://cdn.jsdelivr.net/npm/layui-src/dist/layui.js"></script>#}
+<script>
+    layui.use(['layer', 'echarts', 'count'], function () {
+        var echarts = layui.echarts;
+        var count = layui.count;
+
+        // Dynamic counts
+        count.up('value1', {time: 4000, num: {{ post_count }}, bit: 0, regulator: 50});
+        count.up('value2', {time: 4000, num: {{ series_count }}, bit: 0, regulator: 50});
+        count.up('value3', {time: 4000, num: {{ news_count }}, bit: 0, regulator: 50});
+        count.up('value4', {time: 4000, num: {{ user_count }}, bit: 0, regulator: 50});
+
+        // Initialize ECharts
+        var echartsRecords = echarts.init(document.getElementById('echarts-records'), 'walden');
+        var option = {
+            tooltip: {trigger: 'axis'},
+            xAxis: [{
+                type: 'category',
+                data: ['2024-07', '2024-08', '2024-09', '2024-10', '2024-11', '2024-12'],
+                axisLine: {lineStyle: {color: '#999'}}
+            }],
+            yAxis: [{
+                type: 'value',
+                splitNumber: 4,
+                axisLine: {show: false},
+                splitLine: {lineStyle: {type: 'dashed', color: '#DDD'}}
+            }],
+            series: [{
+                name: '访问量',
+                type: 'line',
+                data: [23, 60, 20, 36, 23, 85],
+                lineStyle: {width: 8, color: 'linear-gradient(to right, #A9F387, #48D8BF)'},
+                itemStyle: {color: '#fff', borderWidth: 10, borderColor: '#A9F387'},
+                smooth: true
+            }]
+        };
+        echartsRecords.setOption(option);
+        window.onresize = echartsRecords.resize;
+    });
+</script>
+</body>
+</html>

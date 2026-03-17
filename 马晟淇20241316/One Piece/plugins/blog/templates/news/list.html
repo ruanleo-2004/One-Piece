@@ -1,0 +1,162 @@
+{% extends "common/base.html" %}
+
+{% block title %}海贼王 - 最新情报{% endblock %}
+
+{% block header %}
+    <header class="aos-init" data-aos="header-slide-left" style="margin-bottom: 30px; width: 100%; background-color: #84dbfa; position: relative;">
+        <img src="{{ url_for('static', filename='blog/images/rakugaki_mv_pc.png') }}" alt="One Piece Header" style="display: block; margin: 0 auto; width: 45vw !important; height: auto; object-fit: contain;"/>
+    </header>
+{% endblock %}
+
+{% block main %}
+    <link href="{{ url_for('static', filename='blog/css/news.css') }}" rel="stylesheet" />
+    <style>
+        /* 设置页面背景颜色 */
+        body {
+            background-color: #f4efe6;
+        }
+        
+        /* 设置h1标题文字部分背景颜色、阴影、字号和圆角 */
+        h1 {
+            display: inline;
+            background-color: #fffae8;
+            padding: 0 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            font-size: 2em;
+            font-weight: bold;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        /* 自定义动画：整个header从中间向左移动 */
+        @keyframes headerSlideLeft {
+            0% {
+                transform: translateX(50%);
+            }
+            100% {
+                transform: translateX(0);
+            }
+        }
+        
+        /* 将动画应用到header元素 */
+        header[data-aos="header-slide-left"] {
+            opacity: 0;
+            animation-fill-mode: both;
+        }
+        
+        header[data-aos="header-slide-left"].aos-animate {
+            opacity: 1;
+            animation: headerSlideLeft 1.3s ease-in-out forwards;
+        }
+    </style>
+    <h1>ニュース一覧</h1>
+
+    <!-- 排序选择器 -->
+    <div style="text-align: right; margin-bottom: 20px;">
+        <label style="margin-right: 10px;">排序方式：</label>
+        <select id="sortSelect" onchange="changeSort(this.value)" style="padding: 8px 15px; border-radius: 5px; border: 1px solid #ddd; cursor: pointer;">
+            <option value="desc" {% if current_sort == 'desc' %}selected{% endif %}>最新优先（降序）</option>
+            <option value="asc" {% if current_sort == 'asc' %}selected{% endif %}>最早优先（升序）</option>
+        </select>
+    </div>
+
+    <div class="row">
+        {% for article in articles %}
+        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-2 mb-3"  data-aos="fade-up" data-aos-duration="{{ loop.index*300 }}">
+            <a href="{{ url_for('blog.news.detail', id=article.id) }}" class="news-card-link">
+                <div class="card h-100">
+                    <img src="{{ article.cover or url_for('static', filename='images/default-news.jpg') }}" class="card-img-top" alt="{{ article.title }}">
+                    <div class="card-body bg-dark-s">
+                        <h5 class="card-title">{{ article.title }}</h5>
+                        <p class="card-text">{{ article.category_name }}</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <style>
+            /* 解决所有蓝色问题 */
+            /* 1. 确保链接本身不会变成蓝色 */
+            .news-card-link {
+                text-decoration: none;
+                color: black !important;
+            }
+            
+            /* 2. 卡片悬停效果 */
+            .news-card-link:hover .card {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+                transition: all 0.3s ease;
+            }
+            
+            /* 3. 默认状态下没有下划线 */
+            .news-card-link h5.card-title,
+            .news-card-link p.card-text {
+                color: black !important;
+                text-decoration: none !important;
+            }
+            
+            /* 4. 确保所有子元素都是黑色 */
+            .news-card-link * {
+                color: black !important;
+            }
+            
+            /* 5. 悬停时才显示黑色下划线 */
+            .news-card-link:hover h5.card-title,
+            .news-card-link:hover p.card-text {
+                color: black !important;
+                text-decoration: underline !important;
+                text-decoration-color: black !important;
+                text-decoration-line: underline !important;
+            }
+        </style>
+        {% endfor %}
+    </div>
+    <nav>
+        <ul class="pagination justify-content-center">
+            {% if pagination.has_prev %}
+            <li class="page-item"><a class="page-link" href="#" data-page="{{ pagination.prev_num }}">Previous</a></li>
+            {% endif %}
+            {% for page in pagination.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
+            <li class="page-item {% if page == pagination.page %}active{% endif %}">
+                <a class="page-link" href="#" data-page="{{ page }}"> {% if page ==None %} ... {% else %} {{ page }} {% endif %}</a>
+            </li>
+            {% endfor %}
+            {% if pagination.has_next %}
+            <li class="page-item"><a class="page-link" href="#" data-page="{{ pagination.next_num }}">Next</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    <script>
+        function changeSort(sortValue) {
+            // 使用SPA路由导航，避免音乐中断
+            const newPath = window.location.pathname + '?page=1&sort=' + sortValue;
+            if (window.spaApp && window.spaApp.router) {
+                window.spaApp.router.navigateTo(newPath);
+            } else {
+                window.location.href = newPath;
+            }
+        }
+        
+        // 处理分页链接点击事件 - 使用事件委托，确保动态生成的链接也能正常工作
+        document.addEventListener('click', function(e) {
+            const link = e.target.closest('.pagination .page-link[data-page]');
+            if (link) {
+                e.preventDefault();
+                const page = link.getAttribute('data-page');
+                if (!page || page === 'None') return;
+                
+                // 获取当前排序方式
+                const sortSelect = document.getElementById('sortSelect');
+                const sortValue = sortSelect ? sortSelect.value : 'desc';
+                
+                // 使用SPA路由导航，避免音乐中断
+                const newPath = window.location.pathname + '?page=' + page + '&sort=' + sortValue;
+                if (window.spaApp && window.spaApp.router) {
+                    window.spaApp.router.navigateTo(newPath);
+                } else {
+                    window.location.href = newPath;
+                }
+            }
+        });
+    </script>
+{% endblock %}

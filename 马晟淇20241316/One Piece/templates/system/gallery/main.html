@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>漫画管理</title>
+    {% include 'system/common/header.html' %}
+</head>
+<body class="pear-container">
+<div class="layui-card">
+    <div class="layui-card-body">
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <label class="layui-form-label">图片名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="image_name" placeholder="输入图片名称" class="layui-input">
+                </div>
+                <button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="gallery-query">
+                    <i class="layui-icon layui-icon-search"></i> 查询
+                </button>
+                <button type="reset" class="pear-btn pear-btn-md">
+                    <i class="layui-icon layui-icon-refresh"></i> 重置
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="layui-card">
+    <div class="layui-card-body">
+        <table id="gallery-table" lay-filter="gallery-table"></table>
+    </div>
+</div>
+
+<script type="text/html" id="gallery-toolbar">
+    <button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add">
+        <i class="layui-icon layui-icon-add-1"></i> 新增图片
+    </button>
+</script>
+
+<script type="text/html" id="gallery-bar">
+    <button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="edit">
+        <i class="layui-icon layui-icon-edit"></i> 编辑
+    </button>
+    <button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove">
+        <i class="layui-icon layui-icon-delete"></i> 删除
+    </button>
+</script>
+
+{% include 'system/common/footer.html' %}
+<script>
+    layui.use(['table', 'form', 'jquery', 'layer'], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let $ = layui.jquery;
+
+        let MODULE_PATH = "{{url_for('system.gallery.index')}}";
+        // 确保路径以斜杠结尾
+        if (!MODULE_PATH.endsWith('/')) {
+            MODULE_PATH += '/';
+        }
+
+        table.render({
+            elem: '#gallery-table',
+            url: MODULE_PATH + 'data',
+            page: true,
+            cols: [
+                [
+                    {title: 'ID', field: 'id', align: 'center', width: 80},
+                    {title: '图片预览', field: 'image_path', align: 'center', width: 100, templet: function(d) {
+                        return '<img src="' + d.image_path + '" style="width: 80px; height: 60px; object-fit: cover;">';
+                    }},
+                    {title: '图片名称', field: 'image_name', align: 'center', width: 200},
+                    {title: '描述', field: 'description', align: 'center', width: 250},
+                    {title: '图片路径', field: 'image_path', align: 'left', width: 300},
+                    {title: '创建时间', field: 'created_at', align: 'center', width: 150},
+                    {title: '操作', toolbar: '#gallery-bar', align: 'center', width: 200}
+                ]
+            ],
+            toolbar: '#gallery-toolbar',
+            defaultToolbar: ['filter', 'print', 'exports']
+        });
+
+        table.on('toolbar(gallery-table)', function (obj) {
+            if (obj.event === 'add') {
+                window.add();
+            }
+        });
+
+        table.on('tool(gallery-table)', function (obj) {
+            if (obj.event === 'edit') {
+                window.edit(obj);
+            } else if (obj.event === 'remove') {
+                window.remove(obj);
+            }
+        });
+
+        window.add = function () {
+            layer.open({
+                type: 2,
+                title: '新增图片',
+                area: ['800px', '600px'],
+                content: MODULE_PATH + 'add'
+            });
+        };
+
+        window.edit = function (obj) {
+            layer.open({
+                type: 2,
+                title: '编辑图片',
+                area: ['800px', '600px'],
+                content: MODULE_PATH + 'edit/' + obj.data.id
+            });
+        };
+
+        window.remove = function (obj) {
+            layer.confirm('确定要删除这张图片吗？', {icon: 3, title: '提示'}, function (index) {
+                $.ajax({
+                    url: MODULE_PATH + 'remove/' + obj.data.id,
+                    type: 'delete',
+                    success: function (res) {
+                        if (res.success) {
+                            layer.msg('删除成功', {icon: 1});
+                            obj.del();
+                        } else {
+                            layer.msg('删除失败', {icon: 2});
+                        }
+                    }
+                });
+                layer.close(index);
+            });
+        };
+    });
+</script>
+</body>
+</html>

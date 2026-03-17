@@ -1,0 +1,17 @@
+{
+  "name": "liuxiuzhen",
+  "version": "1.0.0",
+  "description": "海贼王主题网站",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aos": "^2.3.4",
+    "gsap": "^3.12.5",
+    "jquery": "^3.7.1",
+    "layer": "^0.1.0"
+  }
+}

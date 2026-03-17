@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}添加文章{% endblock %}</title>
+    {% include 'system/common/header.html' %}
+    {{ ckeditor.load(version="4.22.1") }}
+    <script src="{{ url_for('static', filename='node_modules/jquery/dist/jquery.js') }}"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/layer/3.5.1/layer.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="pear-container">
+<div class="layui-card">
+    <div class="layui-card-body">
+        <!-- 表单 -->
+        <form id="post-form" class="layui-form" enctype="multipart/form-data">
+            <!-- 标题 -->
+            <div class="layui-form-item">
+                <label class="layui-form-label">标题</label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" required placeholder="请输入标题" class="layui-input">
+                </div>
+            </div>
+
+            <!-- 内容 -->
+            <div class="layui-form-item">
+                <label class="layui-form-label">内容</label>
+                <div class="layui-input-block">
+                    {{ ckeditor.create(name='content') }}
+                    <!-- 表情按钮 -->
+                    <div style="margin-top: 10px;">
+                        <button type="button" id="emoji-btn-content" class="btn btn-sm btn-outline-primary emoji-btn">
+                            <i class="far fa-smile"></i> 表情
+                        </button>
+                        <div id="emoji-picker-content" class="emoji-picker" style="display: none; position: absolute; background: white; border: 1px solid #ddd; padding: 10px; border-radius: 4px; z-index: 1000; max-height: 200px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 封面上传 -->
+            <div class="layui-form-item">
+                <label class="layui-form-label">封面图片</label>
+                <div class="layui-input-block">
+                    <input type="file" name="cover" accept="image/png, image/jpeg" class="layui-input">
+                    <p class="layui-word-aux">支持 jpg/png 格式，大小不超过 5MB。</p>
+                </div>
+            </div>
+
+            <!-- 提交和重置按钮 -->
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button type="submit" id="submit-btn" class="pear-btn pear-btn-primary">保存</button>
+                    <button type="reset" class="pear-btn">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% include 'system/common/footer.html' %}
+{{ ckeditor.config(name='content', versionCheck=false) }}
+
+<style>
+/* 表情按钮样式 */
+.emoji-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6c757d;
+    background-color: transparent;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    width: auto;
+    height: auto;
+}
+
+.emoji-btn:hover {
+    color: #fff;
+    background-color: #ff6b6b;
+    border-color: #ff6b6b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(255, 107, 107, 0.25);
+    cursor: pointer;
+}
+
+.emoji-btn i {
+    font-size: 16px;
+    pointer-events: none;
+}
+
+.emoji-btn span {
+    pointer-events: none;
+}
+
+/* 表情选择器样式 */
+.emoji-picker {
+    border-radius: 12px !important;
+    border: 1px solid #e0e0e0 !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+    padding: 15px !important;
+    max-height: 250px !important;
+    background: linear-gradient(to bottom right, #ffffff, #f8f9fa) !important;
+}
+
+.emoji-picker span {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    text-align: center;
+    line-height: 32px;
+    border-radius: 6px;
+    margin: 2px;
+    transition: all 0.2s ease;
+}
+
+.emoji-picker span:hover {
+    background-color: #ffecec;
+    transform: scale(1.3);
+    z-index: 1001;
+    position: relative;
+}
+
+/* 改进表情图标显示 */
+.far.fa-smile {
+    transition: transform 0.3s ease;
+}
+
+.emoji-btn:hover .far.fa-smile {
+    transform: rotate(15deg) scale(1.2);
+}
+</style>
+
+<script>
+// 表情符号数组
+var emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐', '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕', '🤑', '🤠', '😈', '👿', '👹', '👺', '🤡', '💩', '👻', '💀', '☠️', '👽', '👾', '🤖', '🎃', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾'];
+
+// 等待CKEditor完全加载后初始化
+CKEDITOR.on('instanceReady', function() {
+    console.log('CKEditor ready, initializing emoji picker');
+    initEmojiPicker('content');
+});
+
+// 页面加载完成后也尝试初始化（作为备选）
+window.onload = function() {
+    console.log('Window loaded, initializing emoji picker');
+    initEmojiPicker('content');
+};
+
+// 初始化表情选择器
+function initEmojiPicker(type) {
+    console.log('Initializing emoji picker for type:', type);
+    var picker = document.getElementById('emoji-picker-' + type);
+    if (picker) {
+        console.log('Found emoji picker element:', picker);
+        if (picker.innerHTML === '') {
+            console.log('Populating emoji picker with', emojis.length, 'emojis');
+            emojis.forEach(function(emoji) {
+                var emojiSpan = document.createElement('span');
+                emojiSpan.textContent = emoji;
+                emojiSpan.style.cursor = 'pointer';
+                emojiSpan.style.fontSize = '20px';
+                emojiSpan.style.margin = '2px';
+                emojiSpan.onclick = function() {
+                    insertEmoji(type, emoji);
+                };
+                picker.appendChild(emojiSpan);
+            });
+            console.log('Emoji picker populated successfully');
+        } else {
+            console.log('Emoji picker already populated');
+        }
+    } else {
+        console.error('Emoji picker element not found for type:', type);
+    }
+}
+
+// 显示/隐藏表情选择器
+function toggleEmojiPicker(type) {
+    console.log('Toggle emoji picker:', type);
+    var picker = document.getElementById('emoji-picker-' + type);
+    if (picker) {
+        console.log('Picker found:', picker);
+        if (picker.style.display === 'none' || picker.style.display === '') {
+            // 隐藏所有其他表情选择器
+            var allPickers = document.querySelectorAll('.emoji-picker');
+            allPickers.forEach(function(p) {
+                p.style.display = 'none';
+            });
+            
+            // 显示当前表情选择器
+            picker.style.display = 'block';
+            console.log('Picker displayed');
+        } else {
+            picker.style.display = 'none';
+            console.log('Picker hidden');
+        }
+    } else {
+        console.error('Picker not found for type:', type);
+    }
+}
+
+// 将表情插入到文本区域
+function insertEmoji(type, emoji) {
+    console.log('Insert emoji:', emoji, 'for type:', type);
+    if (type === 'content') {
+        // 使用CKEditor API插入表情
+        if (CKEDITOR.instances.content) {
+            console.log('Inserting emoji into CKEditor');
+            CKEDITOR.instances.content.insertText(emoji);
+        } else {
+            console.error('CKEditor instance not found');
+        }
+    }
+    
+    // 隐藏表情选择器
+    toggleEmojiPicker(type);
+}
+
+// 点击页面其他地方隐藏表情选择器
+document.addEventListener('click', function(e) {
+    if (!e.target.classList.contains('emoji-btn') && !e.target.closest('.emoji-picker')) {
+        var allPickers = document.querySelectorAll('.emoji-picker');
+        allPickers.forEach(function(picker) {
+            picker.style.display = 'none';
+        });
+    }
+});
+
+// 为表情按钮绑定点击事件
+$(document).ready(function() {
+    $('#emoji-btn-content').click(function() {
+        console.log('Emoji button clicked');
+        toggleEmojiPicker('content');
+    });
+});
+
+    layui.use(['form', 'jquery'], function () {
+        let form = layui.form;
+        let layer = layui.layer;
+        // 提交文章保存
+         form.on('submit', function (data) {
+            $.ajax({
+                url: "{{ url_for('blog.home_post.save') }}", // 调整为创建接口
+                type: "POST",
+                data: new FormData(document.querySelector('form')),
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                    if (res.success) {
+                        layer.msg('保存成功', {icon: 1, time: 1000}, function () {
+                            // window.parent.location.reload();
+                        });
+                    } else {
+                        layer.msg('保存失败：' + res.msg, {icon: 2, time: 2000});
+                    }
+                },
+                error: function () {
+                    layer.msg('提交失败，请稍后重试！', {icon: 2});
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

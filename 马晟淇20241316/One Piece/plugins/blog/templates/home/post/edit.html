@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}编辑文章{% endblock %}</title>
+    {% include 'system/common/header.html' %}
+    {{ ckeditor.load(version="4.22.1") }}
+    <script src="{{ url_for('static', filename='node_modules/jquery/dist/jquery.js') }}"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/layer/3.5.1/layer.js"></script>
+</head>
+<body class="pear-container">
+<div class="layui-card">
+    <div class="layui-card-body">
+        <!-- 表单 -->
+        <form id="post-form" class="layui-form" enctype="multipart/form-data">
+            <!-- 标题 -->
+            <div class="layui-form-item">
+                <label class="layui-form-label">标题</label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" required value="{{ post.title }}" placeholder="请输入标题"
+                           class="layui-input">
+                </div>
+            </div>
+
+            <!-- 内容 -->
+            <div class="layui-form-item">
+                <label class="layui-form-label">内容</label>
+                <div class="layui-input-block">
+                    {{ ckeditor.create(name='content', value=post.content) }}
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">封面图片</label>
+                <div class="layui-input-block">
+                    {% if post.cover %}
+                        <img src="{{ post.cover }}" alt="封面图片"
+                             style="max-width: 200px; margin-bottom: 10px;">
+                    {% endif %}
+                    <input type="file" name="cover" accept="image/png, image/jpeg" class="layui-input">
+                    <p class="layui-word-aux">支持 jpg/png 格式，大小不超过 5MB。</p>
+                </div>
+            </div>
+            {#            <!-- 封面上传 -->#}
+            {#            <div class="layui-form-item">#}
+            {#                <label class="layui-form-label">封面</label>#}
+            {#                <div class="layui-input-block">#}
+            {#                    <input type="file" name="cover" accept="image/png, image/jpeg" class="layui-input">#}
+            {#                    <p class="layui-word-aux">支持 jpg/png 格式，大小不超过 5MB。</p>#}
+            {#                </div>#}
+    </div>
+
+    <!-- 提交和重置按钮 -->
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="submit" id="submit-btn" class="pear-btn pear-btn-primary">保存</button>
+            <button type="reset" class="pear-btn">重置</button>
+        </div>
+    </div>
+    </form>
+</div>
+</div>
+{% include 'system/common/footer.html' %}
+{{ ckeditor.config(name='content', versionCheck=false) }}
+
+<script>
+    layui.use(['form', 'jquery'], function () {
+        let form = layui.form;
+        let layer = layui.layer;
+        // 提交文章保存
+        form.on('submit', function (data) {
+            $.ajax({
+                url: "{{ url_for('blog.home_post.update', id=post.id) }}",
+                type: "POST",
+                data: new FormData(document.querySelector('form')),
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                    if (res.success) {
+                        layer.msg('保存成功', {icon: 1, time: 1000}, function () {
+                            window.parent.location.reload();
+                        });
+                    } else {
+                        layer.msg('保存失败：' + res.msg, {icon: 2, time: 2000});
+                    }
+                },
+                error: function () {
+                    layer.msg('提交失败，请稍后重试！', {icon: 2});
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

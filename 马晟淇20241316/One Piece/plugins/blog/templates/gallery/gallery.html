@@ -1,0 +1,227 @@
+{% extends "common/base.html" %}
+
+{% block title %}海贼王 - 漫画{% endblock %}
+
+{% block main %}
+<link href="{{ url_for('static', filename='blog/css/gallery.css') }}" rel="stylesheet"/>
+<style>
+    /* 设置h1标题文字部分背景颜色、阴影、字号和圆角 */
+    h1 {
+        display: inline-block;
+        background-color: #fffae8;
+        color: #333;
+        padding: 10px 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        font-size: 2em;
+        font-weight: bold;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        transition: transform 0.3s ease;
+    }
+    h1:hover {
+        transform: scale(1.05);
+    }
+</style>
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">ギャラリー一覧</h1>
+    
+    <!-- 排序选择器 -->
+    <div style="text-align: right; margin-bottom: 20px;">
+        <label style="margin-right: 10px;">排序方式：</label>
+        <select id="sortSelect" onchange="changeSort(this.value)" style="padding: 8px 15px; border-radius: 5px; border: 1px solid #ddd; cursor: pointer;">
+            <option value="desc" selected>最新优先（降序）</option>
+            <option value="asc">最早优先（升序）</option>
+        </select>
+    </div>
+    
+    <div id="gallery" class="row gy-4"></div>
+    <div id="error-message" class="text-center text-danger mt-4" style="display: none;">
+        <p>抱歉，无法加载图片。请稍后再试。</p>
+    </div>
+    
+    <!-- 分页控件 -->
+    <div id="pagination-container" class="mt-5" style="display: none;">
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center" id="pagination"></ul>
+        </nav>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='node_modules/gsap/dist/gsap.min.js') }}"></script>
+<script>
+    // 全局变量和函数
+    window.currentPage = 1;
+    window.currentSort = 'desc'; // 默认降序
+    window.galleryContainer, window.errorMessage, window.paginationContainer, window.pagination;
+    
+    // 初始化漫画页面
+    function initGalleryPage() {
+        window.galleryContainer = document.getElementById("gallery");
+        window.errorMessage = document.getElementById("error-message");
+        window.paginationContainer = document.getElementById("pagination-container");
+        window.pagination = document.getElementById("pagination");
+        
+        // 初始加载第一页
+        loadImages(window.currentPage);
+    }
+    
+    // 页面加载时直接初始化
+    if (document.readyState === 'loading') {
+        document.addEventListener("DOMContentLoaded", initGalleryPage);
+    } else {
+        initGalleryPage();
+    }
+    
+    // 加载图片函数
+    function loadImages(page, sort = window.currentSort) {
+        // 显示加载状态
+        galleryContainer.innerHTML = '<div class="text-center w-100 py-5"><div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div></div>';
+        errorMessage.style.display = "none";
+        paginationContainer.style.display = "none";
+        
+        fetch(`{{ url_for('blog.gallery.get_images') }}?page=${page}&sort=${sort}`)
+            .then(response => response.json())
+            .then(data => {
+                const images = data.images;
+                const paginationInfo = data.pagination;
+                
+                if (images.length === 0) {
+                    throw new Error("No images available");
+                }
+                
+                // 清空画廊
+                galleryContainer.innerHTML = '';
+                
+                // 添加图片
+                images.forEach((image, index) => {
+                    const col = document.createElement("div");
+                    col.classList.add("col-6", "col-md-4", "col-lg-3");
+                    
+                    // Add AOS attributes dynamically
+                    col.setAttribute("data-aos", "fade-up");
+                    col.setAttribute("data-aos-delay", `${index * 100}`); // Staggered delay
+                    
+                    let imgElement;
+                    
+                    // 如果有URL，创建一个链接包装图片
+                    if (image.url && image.url.trim()) {
+                        const link = document.createElement("a");
+                        link.href = image.url;
+                        link.target = "_blank"; // 在新标签页打开
+                        link.rel = "noopener noreferrer"; // 安全属性
+                        
+                        imgElement = document.createElement("img");
+                        imgElement.src = image.image_path;
+                        imgElement.alt = image.image_name || "海贼王漫画图片";
+                        imgElement.classList.add("img-fluid", "rounded");
+                        imgElement.title = "点击查看官网"; // 鼠标悬停提示
+                        
+                        link.appendChild(imgElement);
+                        col.appendChild(link);
+                    } else {
+                        // 没有URL时，普通图片
+                        imgElement = document.createElement("img");
+                        imgElement.src = image.image_path;
+                        imgElement.alt = image.image_name || "海贼王漫画图片";
+                        imgElement.classList.add("img-fluid", "rounded");
+                        imgElement.title = "暂无官网链接";
+                        
+                        col.appendChild(imgElement);
+                    }
+                    
+                    galleryContainer.appendChild(col);
+                });
+                
+                // GSAP animations for hover effects
+                const images_target = document.querySelectorAll("#gallery img");
+                images_target.forEach((img) => {
+                    img.addEventListener("mouseenter", () => {
+                        gsap.to(img, {scale: 1.2, duration: 0.3, ease: "power2.inOut"});
+                    });
+                    
+                    img.addEventListener("mouseleave", () => {
+                        gsap.to(img, {scale: 1, duration: 0.3, ease: "power2.inOut"});
+                    });
+                });
+                
+                // 更新当前页码和排序方式
+                window.currentPage = page;
+                window.currentSort = sort;
+                
+                // 生成分页控件
+                generatePagination(paginationInfo);
+                
+                // 显示分页控件（如果有多个页面）
+                if (paginationInfo.pages > 1) {
+                    paginationContainer.style.display = "block";
+                }
+            })
+            .catch(error => {
+                console.error("Error loading images:", error);
+                galleryContainer.innerHTML = '';
+                errorMessage.style.display = "block";
+                paginationContainer.style.display = "none";
+            });
+    }
+    
+    // 生成分页控件
+    function generatePagination(paginationInfo) {
+        pagination.innerHTML = '';
+        
+        // 上一页按钮
+        const prevLi = document.createElement("li");
+        prevLi.className = `page-item ${paginationInfo.has_prev ? '' : 'disabled'}`;
+        const prevLink = document.createElement("a");
+        prevLink.className = "page-link";
+        prevLink.href = "#";
+        prevLink.innerHTML = "&laquo;";
+        prevLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            if (paginationInfo.has_prev) {
+                loadImages(paginationInfo.page - 1, window.currentSort);
+            }
+        });
+        prevLi.appendChild(prevLink);
+        pagination.appendChild(prevLi);
+        
+        // 页码按钮
+        for (let i = 1; i <= paginationInfo.pages; i++) {
+            const li = document.createElement("li");
+            li.className = `page-item ${i === paginationInfo.page ? 'active' : ''}`;
+            const link = document.createElement("a");
+            link.className = "page-link";
+            link.href = "#";
+            link.textContent = i;
+            link.addEventListener("click", (e) => {
+                e.preventDefault();
+                loadImages(i, window.currentSort);
+            });
+            li.appendChild(link);
+            pagination.appendChild(li);
+        }
+        
+        // 下一页按钮
+        const nextLi = document.createElement("li");
+        nextLi.className = `page-item ${paginationInfo.has_next ? '' : 'disabled'}`;
+        const nextLink = document.createElement("a");
+        nextLink.className = "page-link";
+        nextLink.href = "#";
+        nextLink.innerHTML = "&raquo;";
+        nextLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            if (paginationInfo.has_next) {
+                loadImages(paginationInfo.page + 1, currentSort);
+            }
+        });
+        nextLi.appendChild(nextLink);
+        pagination.appendChild(nextLi);
+    }
+    
+    // 排序变化函数
+    function changeSort(sortValue) {
+        // 重新加载第一页数据，使用新的排序方式
+        loadImages(1, sortValue);
+    }
+</script>
+{% endblock %}

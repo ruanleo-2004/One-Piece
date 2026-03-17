@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>用户注册</title>
+    {% include 'system/common/header.html' %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='system/admin/css/other/login.css') }}"/>
+    <link href="{{ url_for('static', filename='blog/css/bootstrap-4.4.1.css') }}" rel="stylesheet"/>
+    <link href="{{ url_for('static', filename='blog/css/base.css') }}" rel="stylesheet"/>
+</head>
+
+<body class="login-body">
+
+
+<form class="layui-form p-5 bg-dark user-login-form" action="javascript:void(0);">
+    <div class="layui-form-item text-center">
+        <img class="logo" src="{{ url_for('static', filename='picture/logo.png') }}"/>
+        <div class="desc">
+            海贼王网站 用户注册
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <input name="username" type="text" placeholder="用户名：" value="" hover class="layui-input"/>
+    </div>
+    <div class="layui-form-item">
+        <input name="password" type="password" placeholder="密码：" value="" hover class="layui-input"/>
+    </div>
+    <div class="layui-form-item">
+        <input name="confirm_password" type="password" placeholder="确认密码：" value="" hover class="layui-input"/>
+    </div>
+    <div class="layui-form-item">
+        <input placeholder="验证码 : " name="captcha" hover class="code layui-input layui-input-inline"/>
+        <img src="{{ url_for('system.passport.get_captcha') }}" class="codeImage" id="captchaImage"/>
+    </div>
+    <div class="layui-form-item">
+        <input type="checkbox" name="agree_terms" title="我同意注册协议" lay-skin="primary" required>
+    </div>
+    <div class="layui-form-item">
+        <button class="pear-btn pear-btn-success register" lay-submit lay-filter="register">
+            注 册
+        </button>
+    </div>
+</form>
+
+{% include 'system/common/footer.html' %}
+
+<script>
+    layui.use(['form', 'jquery', 'layer', 'button', 'popup'], function () {
+        let form = layui.form;
+        let $ = layui.jquery;
+        let layer = layui.layer;
+        let button = layui.button;
+        let popup = layui.popup;
+        let captchaPath = "{{ url_for('system.passport.get_captcha') }}";
+
+        const refreshCaptchaImage = (function () {
+            let captchaImage = document.getElementById("captchaImage")
+            return function () {
+                captchaImage.src = captchaPath + "?" + Math.random()
+            }
+        })()
+
+        const initCaptchaImageTimer = (function () {
+            let captchaImageTimer = null
+            return function () {
+                clearInterval(captchaImageTimer)
+                captchaImageTimer = setInterval(function () {
+                    refreshCaptchaImage()
+                }, 30 * 1000);
+                refreshCaptchaImage()
+            }
+        })()
+        initCaptchaImageTimer()
+
+        form.on('submit(register)', function (data) {
+            let loader = layer.load();
+            let btn = button.load({elem: '.register'});
+            $.ajax({
+                data: data.field,
+                type: "post",
+                dataType: 'json',
+                success: function (result) {
+                    layer.close(loader);
+                    btn.stop(function () {
+                        if (result.success) {
+                            popup.success(result.msg, function () {
+                                location.href = "{{ url_for('index.home') }}";
+                            })
+                        } else {
+                            popup.failure(result.msg, function () {
+                                initCaptchaImageTimer()
+                            });
+                        }
+                    })
+                }
+            });
+            return false;
+        });
+        $("#captchaImage").click(function () {
+            initCaptchaImageTimer()
+        });
+    })
+</script>
+<script>
+    if (window !== top) {
+        top.location.href = location.href;
+    }
+</script>
+<!-- <script src="{{ url_for('static', filename='blog/js/click-effect.js') }}"></script> -->
+<script src="{{ url_for('static', filename='blog/js/jquery-3.4.1.min.js') }}"></script>
+<script src="{{ url_for('static', filename='blog/js/popper.min.js') }}"></script>
+<script src="{{ url_for('static', filename='blog/js/bootstrap-4.4.1.js') }}"></script>
+<!-- <script src="{{ url_for('static', filename='blog/js/star-bg.js') }}"></script> -->
+<script src="{{ url_for('static', filename='blog/js/drag-nav.js') }}"></script>
+</body>
+</html>

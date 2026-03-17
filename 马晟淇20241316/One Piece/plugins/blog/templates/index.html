@@ -1,0 +1,361 @@
+{% extends "common/base.html" %}
+
+{% block title %}海贼王-冒险启航{% endblock %}
+{% block header %}
+    <header class="aos-init" data-aos="header-slide-left" style="margin-bottom: 30px; width: 100%; background-color: #9FDB48; position: relative;">
+        <img src="{{ url_for('static', filename='blog/images/about_mv_pc.png') }}" alt="One Piece Header" style="display: block; margin: 0 auto; width: 45vw !important; height: auto; object-fit: contain;"/>
+    </header>
+{% endblock %}
+
+{% block bottom_header %}
+    <!-- 新增底层header（图片版） -->
+    <div class="bottom-header" style="text-align: center; padding: 0; margin: 0 auto 0; width: 100%; box-sizing: border-box; max-width: 100%;">
+        <img src="{{ url_for('static', filename='blog/images/footer_characters.webp') }}" alt="海贼王角色" style="width: 60%; height: auto; object-fit: contain; display: block; margin: 0 auto; box-sizing: border-box; max-width: 100%;">
+    </div>
+{% endblock %}
+
+{% block main %}
+{#    <link href="{{ url_for('static', filename='blog/css/card.css') }}" rel="stylesheet"/>#}
+    <style>
+    .card img{
+    height: 400px!important;
+        object-fit: cover;
+        width: 100%;
+}
+
+
+    
+    /* 自定义动画：整个header从中间向左移动 */
+    @keyframes headerSlideLeft {
+        0% {
+            transform: translateX(50%);
+        }
+        100% {
+            transform: translateX(0);
+        }
+    }
+    
+    /* 将动画应用到header元素 */
+    header[data-aos="header-slide-left"] {
+        opacity: 0;
+        animation-fill-mode: both;
+    }
+    
+    header[data-aos="header-slide-left"].aos-animate {
+        opacity: 1;
+        animation: headerSlideLeft 1.3s ease-in-out forwards;
+    }
+    
+    /* 增大overview-text div中除h3外的文字大小 */
+    .overview-text p {
+        font-size: 1.2rem;
+    }
+    
+    /* 新增区块样式 */
+    .onepiece-intro {
+        margin: 0 auto 30px;
+        max-width: 75%;
+        background-image: url('/static/blog/images/about_01.png');
+        background-size: cover;
+        background-position: center;
+        padding: 50px;
+        text-align: center;
+        color: black;
+        font-family: 'Meiryo', 'メイリオ', sans-serif;
+        text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.7);
+        border-radius: 20px;
+    }
+    </style>
+
+    <!-- 新增区块 -->
+    <section class="onepiece-intro">
+        <div style="padding: 30px; display: inline-block; max-width: 80%;">
+            <h1 style="font-size: 2em; margin-bottom: 20px; font-weight: 500;">世は大海賊時代ー</h1>
+            <p style="margin-bottom: 10px;">前人未踏の世界一周を果たした海の覇者</p>
+            <p style="margin-bottom: 20px;">〝海賊王〟ゴール・D・ロジャー。</p>
+            
+            <p style="margin-bottom: 10px;">富、名声、力、かつてこの世の全てを手に入れたという彼が、死に際に放った一言が、世界をゆるがせた。</p>
+            
+            <p style="font-size: 1.5em; margin: 20px 0; font-style: italic; font-weight: bolder;">『おれの財宝か？ 欲しけりゃくれてやるぜ…</p>
+            <p style="font-size: 1.5em; margin: 0 0 20px 0; font-style: italic; font-weight: bolder;">探してみろ この世の全てを そこに置いてきた』</p>
+            
+            <p style="margin-bottom: 10px;">その言葉は大きなうねりを生み、多くの猛者たちを海へと駆り立てた。</p>
+            
+            <p style="margin-bottom: 10px;">〝海賊王〟が遺した〝ひとつなぎの大秘宝(ワンピース)〟をめぐり、</p>
+            <p style="margin-bottom: 20px;">ある者は野望を抱き、ある者はロマンを求めて、海賊たちは信念の旗の下に戦い、名を上げていく。</p>
+            
+            <p style="margin-bottom: 10px;">波乱と冒険に満ちたそんな時代に、</p>
+            <p style="margin-bottom: 20px;">1人の少年モンキー・D・ルフィが〝海賊王〟をめざして、大海原へ乗り出した!</p>
+            
+            <p style="margin-bottom: 10px;">数々の冒険の中で仲間を増やし、成長していくルフィ。</p>
+            <p style="margin-bottom: 0;">ルフィを船長とする海賊〝麦わらの一味〟は、〝ひとつなぎの大秘宝(ワンピース)〟をめざし、航海を続ける!!</p>
+        </div>
+    </section>
+
+
+    
+    <section id="overview" class="bg-white" style="margin-top: 150px; padding-left: 0;">
+        <div class="container p-0">
+            <div class="row m-0">
+                <div class="col-md-6 pl-0 aos-init" data-aos="fade-right" style="overflow: hidden; min-height: 400px;">
+                <img class="d-block w-100 img-fluid" src="{{ url_for('static', filename='blog/images/草帽团.jpg')}}" alt="海贼王草帽团" style="height: 100%; object-fit: cover;">
+            </div>
+                <div class="col-md-6 d-flex flex-column justify-content-center align-items-center overview-text" data-aos="fade-left">
+                    <div class="row">
+                        <div class="col">
+                            <h3 class="text-dark">懸賞金総額</h3>
+                            <p>88億1600万1000ベリー</p>
+                        </div>
+                        <div class="col">
+                            <h3 class="text-dark">誕生日</h3>
+                            <p style="white-space: nowrap;">6月13日（麦わらの一味の日）</p>
+                        </div>
+                    </div>
+                    <p><strong>主人公モンキー・D・ルフィが東の海で結成した海賊団。</strong></p>
+                    <p>2年の修業を経てシャボンディ諸島に再集結した麦わらの一味。最後の島“ラフテル”を目指し新世界を進む！</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+
+
+    <!-- 海贼王角色卡片 -->
+    <style>
+        #characters a {
+            text-decoration: none;
+            color: inherit;
+        }
+        #characters a:hover {
+            text-decoration: none;
+        }
+        #characters .character-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            padding: 15px;
+            margin-bottom: 25px;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        #characters .character-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+        #characters .character-card img {
+            width: 80px;
+            height: 80px;
+            border-radius: 5px;
+            object-fit: cover;
+            align-self: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        #characters .character-card:hover img {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        #characters .character-info {
+            margin-left: 15px;
+        }
+        #characters .character-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        #characters .character-info p {
+            font-size: 0.9rem;
+            margin-bottom: 3px;
+            color: #666;
+        }
+        #characters .character-info p:last-child {
+            margin-bottom: 0;
+        }
+        /* 文本与照片对齐调整 - 保持照片垂直居中 */
+        #characters .col-md-4:not(:first-child) .character-card {
+            display: flex;
+            align-items: center;
+        }
+        #characters .col-md-4:not(:first-child) .character-info {
+            margin-left: 15px;
+        }
+        #characters .col-md-4:not(:first-child) .character-info h3 {
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+    </style>
+    <section id="characters" class="py-5 mb-5 bg-light" style="margin-top: 100px; background-color: #FFFAE8 !important; border-radius: 20px;">
+        <div class="container">
+            <h2 class="text-center mb-4" data-aos="fade-up">麦わらの一味</h2>
+            <div class="row g-4" id="characters-container">
+                <!-- 角色卡片 -->
+                <div class="col-md-4">
+                    <a href="https://one-piece.com/character/luffy/index.html" target="_blank">
+                        <div class="character-card">
+                            <img src="{{ url_for('static', filename='blog/images/伙伴图片/face 1.jpg') }}" alt="モンキー・D・ルフィ">
+                            <div class="character-info">
+                                <h3>モンキー・D・ルフィ</h3>
+                                <p>懸賞金: 30億ベリー</p>
+                                <p>悪魔の実: ゴムゴムの実 ヒトヒトの実 幻獣種 モデル ニカ。</p>
+                                <p>組織: 麦わらの一味</p>
+                                <p>最悪の世代</p>
+                                <p>誕生日: 5月5日</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="https://one-piece.com/character/zoro/index.html" target="_blank">
+                        <div class="character-card">
+                            <img src="{{ url_for('static', filename='blog/images/伙伴图片/face 2.jpg') }}" alt="ロロノア・ゾロ">
+                            <div class="character-info">
+                                <h3>ロロノア・ゾロ</h3>
+                                <p>懸賞金: 11億1100万ベリー</p>
+                                <p>組織: 麦わらの一味</p>
+                                <p>最悪の世代</p>
+                                <p>誕生日: 11月11日</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="https://one-piece.com/character/nami/index.html" target="_blank">
+                        <div class="character-card">
+                            <img src="{{ url_for('static', filename='blog/images/伙伴图片/face 3.jpg') }}" alt="ナミ">
+                            <div class="character-info">
+                                <h3>ナミ</h3>
+                                <p>懸賞金: 3億6600万ベリー</p>
+                                <p>組織: 麦わらの一味</p>
+                                <p>誕生日: 7月3日</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="https://one-piece.com/character/usopp/index.html" target="_blank">
+                        <div class="character-card">
+                            <img src="{{ url_for('static', filename='blog/images/伙伴图片/face 4.jpg') }}" alt="ウソップ">
+                            <div class="character-info">
+                                <h3>ウソップ</h3>
+                                <p>懸賞金: 5億ベリー</p>
+                                <p>組織: 麦わらの一味</p>
+                                <p>誕生日: 4月1日</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="https://one-piece.com/character/sanji/index.html" target="_blank">
+                        <div class="character-card">
+                            <img src="{{ url_for('static', filename='blog/images/伙伴图片/face 5.jpg') }}" alt="サンジ">
+                            <div class="character-info">
+                                <h3>サンジ</h3>
+                                <p>懸賞金: 10億3200万ベリー</p>
+                                <p>組織: 麦わらの一味</p>
+                                <p>誕生日: 3月2日</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="https://one-piece.com/character/chopper/index.html" target="_blank">
+                        <div class="character-card">
+                            <img src="{{ url_for('static', filename='blog/images/伙伴图片/face 6.jpg') }}" alt="トニートニー・チョッパー">
+                            <div class="character-info">
+                                <h3>トニートニー・チョッパー</h3>
+                                <p>懸賞金: 1000ベリー</p>
+                                <p>悪魔の実: ヒトヒトの実</p>
+                                <p>組織: 麦わらの一味</p>
+                                <p>誕生日: 12月24日</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="https://one-piece.com/character/robin/index.html" target="_blank">
+                        <div class="character-card">
+                            <img src="{{ url_for('static', filename='blog/images/伙伴图片/face 7.jpg') }}" alt="ニコ・ロビン">
+                            <div class="character-info">
+                                <h3>ニコ・ロビン</h3>
+                                <p>懸賞金: 9億3000万ベリー</p>
+                                <p>悪魔の実: ハナハナの実</p>
+                                <p>組織: 麦わらの一味</p>
+                                <p>誕生日: 2月6日</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="https://one-piece.com/character/franky/index.html" target="_blank">
+                        <div class="character-card">
+                            <img src="{{ url_for('static', filename='blog/images/伙伴图片/face 8.jpg') }}" alt="フランキー">
+                            <div class="character-info">
+                                <h3>フランキー</h3>
+                                <p>懸賞金: 3億9400万ベリー</p>
+                                <p>組織: 麦わらの一味</p>
+                                <p>誕生日: 3月9日</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="https://one-piece.com/character/brook/index.html" target="_blank">
+                        <div class="character-card">
+                            <img src="{{ url_for('static', filename='blog/images/伙伴图片/face 9.jpg') }}" alt="ブルック">
+                            <div class="character-info">
+                                <h3>ブルック</h3>
+                                <p>懸賞金: 3億8300万ベリー</p>
+                                <p>悪魔の実: ヨヨヨの実</p>
+                                <p>組織: 麦わらの一味</p>
+                                <p>誕生日: 4月3日</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="https://one-piece.com/character/Jinbe/index.html" target="_blank">
+                        <div class="character-card">
+                            <img src="{{ url_for('static', filename='blog/images/伙伴图片/face 10.jpg') }}" alt="ジンベエ">
+                            <div class="character-info">
+                                <h3>ジンベエ</h3>
+                                <p>懸賞金: 11億ベリー</p>
+                                <p>組織: 麦わらの一味</p>
+                                <p>誕生日: 4月2日</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <!-- 新增伙伴卡片 -->
+                <div class="col-md-4">
+                    <a href="https://one-piece.com/character/Going_Merry/index.html" target="_blank">
+                        <div class="character-card">
+                            <img src="{{ url_for('static', filename='blog/images/伙伴图片/face 11.jpg') }}" alt="ゴーイング・メリー一号">
+                            <div class="character-info">
+                                <h3>ゴーイング・メリー一号</h3>
+                                <p>組織: 麦わらの一味</p>
+                                <p>誕生日: 1月22日</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="https://one-piece.com/character/Thousand_Sunny/index.html" target="_blank">
+                        <div class="character-card">
+                            <img src="{{ url_for('static', filename='blog/images/伙伴图片/face 12.jpg') }}" alt="サウサンド・サニー号">
+                            <div class="character-info">
+                                <h3>サウサンド・サニー号</h3>
+                                <p>組織: 麦わらの一味</p>
+                                <p>誕生日: 3月25日</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+

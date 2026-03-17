@@ -1,0 +1,81 @@
+{% extends "common/base.html" %}
+
+{% block title %}我的收藏 - 个人中心{% endblock %}
+
+{% block main %}
+<div class="container my-4">
+    <!-- 页面标题 -->
+    <div class="card bg-white border-light mb-4">
+        <div class="card-body">
+            <h2 class="card-title">我的收藏</h2>
+            <p class="card-text">这里是你收藏的所有文章</p>
+        </div>
+    </div>
+
+    <!-- 收藏的文章 -->
+    <div class="mb-4">
+        <div class="row g-4">
+            {% if favorite_posts.items %}
+            {% for post in favorite_posts.items %}
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card bg-white border-light h-100">
+                    <!-- 文章封面 -->
+                    {% if post.cover %}
+                    <img src="{{ post.cover }}" alt="{{ post.title }}" class="card-img-top img-fluid" style="object-fit: cover; height: 200px;">
+                    {% endif %}
+                    <!-- 文章内容 -->
+                    <div class="card-body">
+                        <h5 class="card-title text-truncate">{{ post.title }}</h5>
+                        <p class="card-text text-truncate">{{ post.content|safe }}</p>
+                    </div>
+                    <!-- 文章底部信息 -->
+                    <div class="card-footer">
+                        <small class="text-muted">发布时间: {{ post.date_posted.strftime('%Y-%m-%d') }}</small>
+                        <div class="float-end">
+                            <a href="{{ url_for('blog.post.detail', post_id=post.id) }}" class="btn btn-sm" style="background-color: #007bff; border-color: #007bff; color: white;" target="_blank">阅读全文</a>
+                            {% if current_user.is_authenticated %}
+                                {% if current_user.is_favoriting(post) %}
+                                <a href="{{ url_for('blog.post.unfavorite', post_id=post.id) }}" class="btn btn-danger btn-sm">已收藏</a>
+                                {% else %}
+                                <a href="{{ url_for('blog.post.favorite', post_id=post.id) }}" class="btn btn-outline-danger btn-sm">收藏</a>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="col-12">
+                <div class="alert alert-info text-center" role="alert">
+                    你还没有收藏任何文章
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 分页导航 -->
+    {% if favorite_posts.pages > 1 %}
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if favorite_posts.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('blog.user.favorites', page=favorite_posts.prev_num) }}">上一页</a>
+            </li>
+            {% endif %}
+            {% for page in favorite_posts.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+            <li class="page-item {% if page == favorite_posts.page %}active{% endif %}">
+                <a class="page-link" href="{{ url_for('blog.user.favorites', page=page) }}">{{ page }}</a>
+            </li>
+            {% endfor %}
+            {% if favorite_posts.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('blog.user.favorites', page=favorite_posts.next_num) }}">下一页</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

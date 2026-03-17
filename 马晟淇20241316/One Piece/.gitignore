@@ -1,0 +1,33 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+instance/
+*.db
+*.db-journal
+.DS_Store
+*.log
+*.pid
+*.bak
+*.swp
+*~
+.~n*
+# Flask
+instance/
+.webassets-cache
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+# OS
+Thumbs.db
+.DS_Store
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/

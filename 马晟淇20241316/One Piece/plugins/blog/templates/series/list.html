@@ -1,0 +1,74 @@
+{% extends "common/base.html" %}
+
+{% block title %}
+{{ series_type if series_type else "系列列表" }}
+{% endblock %}
+
+{% block main %}
+        <link href="{{ url_for('static', filename='blog/css/card.css') }}" rel="stylesheet" />
+    <style>
+    .card img{
+    height: 400px!important;
+        object-fit: cover;
+        width: 100%;
+}
+    </style>
+
+<div class="container my-5">
+    <h1 class="text-center">{{ series_type if series_type else "作品列表" }}</h1>
+    <div class="row">
+        {% for series in series_list %}
+        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3 col-xxl-3 mb-4" data-aos="fade-up" data-aos-duration="{{ loop.index*300 }}">
+            <div class="r-card card">
+                <img src="{{ series.cover if series.cover.startswith('http') else url_for('static', filename=series.cover) }}" class="card-img-top" alt="{{ series.name }}">
+                <div class="card-body bg-dark-s">
+                    <h5 class="card-title">{{ series.name }}</h5>
+                    <p class="card-text">Year: {{ series.year }}</p>
+                    <a href="{{ series.link }}" class="btn btn-primary" target="_blank">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- 分页 -->
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if pagination.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('blog.series.index', page=pagination.prev_num, series_type=series_type) }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&laquo;</span>
+            </li>
+            {% endif %}
+
+            {% for page in pagination.iter_pages() %}
+            {% if page %}
+            <li class="page-item {% if page == pagination.page %}active{% endif %}">
+                <a class="page-link" href="{{ url_for('blog.series.index', page=page, series_type=series_type) }}">{{ page }}</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">...</span></li>
+            {% endif %}
+            {% endfor %}
+
+            {% if pagination.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('blog.series.index', page=pagination.next_num, series_type=series_type) }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&raquo;</span>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+
+{% endblock %}

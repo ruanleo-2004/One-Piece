@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>系列管理</title>
+    {% include 'system/common/header.html' %}
+</head>
+<body class="pear-container">
+<div class="layui-card">
+    <div class="layui-card-body">
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <label class="layui-form-label">系列名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="name" placeholder="输入系列名称" class="layui-input">
+                </div>
+                <button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="series-query">
+                    <i class="layui-icon layui-icon-search"></i>
+                    查询
+                </button>
+                <button type="reset" class="pear-btn pear-btn-md">
+                    <i class="layui-icon layui-icon-refresh"></i>
+                    重置
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="layui-card">
+    <div class="layui-card-body">
+        <table id="series-table" lay-filter="series-table"></table>
+    </div>
+</div>
+
+<script type="text/html" id="series-toolbar">
+    <button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add">
+        <i class="layui-icon layui-icon-add-1"></i>
+        新增系列
+    </button>
+</script>
+
+<script type="text/html" id="series-bar">
+    <button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="edit"><i class="layui-icon layui-icon-edit"></i> 编辑
+    </button>
+    <button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove"><i class="layui-icon layui-icon-delete"></i>
+        删除
+    </button>
+</script>
+
+{% include 'system/common/footer.html' %}
+<script>
+    layui.use(['table', 'form', 'jquery', 'layer'], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let $ = layui.jquery;
+
+        let MODULE_PATH = '/system/series/';
+
+        table.render({
+            elem: '#series-table',
+            url: MODULE_PATH + 'data',
+            page: true,
+            cols: [
+                [
+                    {title: 'ID', field: 'id', align: 'center', width: 80},
+                    {title: '系列名称', field: 'name', align: 'center', width: 200},
+                    {title: '类型', field: 'type', align: 'center', width: 150},
+                    {title: '年份', field: 'year', align: 'center', width: 100},
+                    {title: '操作', toolbar: '#series-bar', align: 'center', width: 300}
+                ]
+            ],
+            toolbar: '#series-toolbar',
+            defaultToolbar: ['filter', 'print', 'exports']
+        });
+
+        table.on('toolbar(series-table)', function (obj) {
+            if (obj.event === 'add') {
+                window.add();
+            }
+        });
+
+        table.on('tool(series-table)', function (obj) {
+            if (obj.event === 'edit') {
+                window.edit(obj);
+            } else if (obj.event === 'remove') {
+                window.remove(obj);
+            }
+        });
+
+        window.add = function () {
+            layer.open({
+                type: 2,
+                title: '新增系列',
+                area: ['800px', '600px'],
+                content: MODULE_PATH + 'add'
+            });
+        };
+
+        window.edit = function (obj) {
+            layer.open({
+                type: 2,
+                title: '编辑系列',
+                area: ['800px', '600px'],
+                content: MODULE_PATH + 'edit/' + obj.data.id
+            });
+        };
+
+        window.remove = function (obj) {
+            layer.confirm('确实要删除这条系列吗？', {icon: 3, title: '提示'}, function (index) {
+                $.ajax({
+                    url: MODULE_PATH + 'remove/' + obj.data.id,
+                    type: 'delete',
+                    success: function (res) {
+                        if (res.success) {
+                            layer.msg('删除成功', {icon: 1});
+                            obj.del();
+                        } else {
+                            layer.msg('删除失败', {icon: 2});
+                        }
+                    }
+                });
+                layer.close(index);
+            });
+        };
+    });
+</script>
+</body>
+</html>
